@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
 using GolemCore.Models;
 
 namespace GolemCore;
@@ -6,8 +7,14 @@ namespace GolemCore;
 public class GolemApiClient : IGolemApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly JsonSerializerOptions options;
 
-    public GolemApiClient(HttpClient httpClient) => _httpClient = httpClient;
+    public GolemApiClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+
+        options = new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null});
+    }
 
     public async Task<List<Golem>> GetGolemSelection(CancellationToken cancellationToken)
     {
@@ -23,7 +30,7 @@ public class GolemApiClient : IGolemApiClient
 
     public async Task CreateGolem(CreateGolemRequest golem, CancellationToken cancellationToken)
     {
-        var result = await _httpClient.PostAsJsonAsync(Constants.PostGolemEndpoint, golem, cancellationToken);
+        var result = await _httpClient.PostAsJsonAsync(Constants.PostGolemEndpoint, golem, options, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
