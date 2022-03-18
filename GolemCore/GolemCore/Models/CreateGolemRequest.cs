@@ -2,6 +2,7 @@
 
 public class CreateGolemRequest
 {
-    public const string TableName = "golem";
+    public string TableName { get; init; } = "golem";
+
     public Golem Item { get; init; } = new();
 }
