@@ -2,7 +2,7 @@
 using GolemCore.Models;
 
 Console.WriteLine("Hello, World!");
-const string apiBase = "***REMOVED***/";
+const string apiBase = "***REMOVED***";
 
 var client = GolemApiClientFactory.Create(apiBase, "***REMOVED***");
 
@@ -10,8 +10,8 @@ var cancellationToken = new CancellationToken();
 
 var golem = new Golem
 {
+    UserId = "1",
     Class = "ice",
-    Id = 4,
     Size = "colossal"
 };
 
