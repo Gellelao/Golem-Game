@@ -8,15 +8,42 @@ var client = GolemApiClientFactory.Create(apiBase, "***REMOVED***");
 
 var cancellationToken = new CancellationToken();
 
-var golem = new Golem
+var golem1 = new Golem
 {
     UserId = "1",
-    Class = "ice",
-    Size = "colossal"
+    Parts = new []
+    {
+        new []{1, 1, 1},
+        new []{0, 0, 0},
+        new []{1, 0, 1},
+    }
 };
 
-await client.CreateGolem(new CreateGolemRequest{Item = golem}, cancellationToken);
+var golem2 = new Golem
+{
+    UserId = "2",
+    Parts = new []
+    {
+        new []{0, 1, 0},
+        new []{0, 0, 0},
+        new []{0, 0, 0},
+    }
+};
 
-var golems = await client.GetGolemSelection(new CancellationToken());
+var results = Resolver.GetOutcome(golem1, golem2);
+foreach (var result in results)
+{
+    Console.WriteLine(result);
+}
 
-golems.ForEach(g => Console.WriteLine(g.Class));
+var parts = await client.GetParts(cancellationToken);
+foreach (var part in parts)
+{
+    Console.WriteLine(part.Name);
+}
+
+// await client.CreateGolem(new CreateGolemRequest{Item = golem1}, cancellationToken);
+//
+// var golems = await client.GetGolemSelection(new CancellationToken());
+//
+// golems.ForEach(g => Console.WriteLine(g.Parts[0][0]));

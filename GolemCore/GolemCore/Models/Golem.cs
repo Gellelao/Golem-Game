@@ -1,10 +1,17 @@
-﻿namespace GolemCore.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace GolemCore.Models;
 
 public class Golem
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public DateTime Timestamp { get; init; } = DateTime.Now;
 
     public string UserId { get; init; }
-    public string Size { get; init; }
-    public string Class { get; init; }
+    public int[][] Parts { get; init; } = new int[][]
+    {
+        new int[3],
+        new int[3],
+        new int[3]
+    };
 }
