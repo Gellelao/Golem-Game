@@ -38,8 +38,15 @@ public class GolemApiClient : IGolemApiClient
         }
     }
 
-    public Task GetBattleResults(Golem myGolem, Golem opponent, CancellationToken cancellationToken)
+    public async Task<List<Part>> GetParts(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var parts = await _httpClient.GetFromJsonAsync<PartFetchResponse>(Constants.GetPartEndpoint, cancellationToken);
+
+        if (parts is null or { Items.Count: 0 } or { Count: 0 })
+        {
+            throw new InvalidOperationException("Failed to fetch any parts");
+        }
+
+        return parts.Items;
     }
 }
