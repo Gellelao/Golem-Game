@@ -2,9 +2,8 @@
 using GolemCore.Models;
 
 Console.WriteLine("Hello, World!");
-const string apiBase = "***REMOVED***";
 
-var client = GolemApiClientFactory.Create(apiBase, "***REMOVED***");
+var client = GolemApiClientFactory.Create();
 
 var cancellationToken = new CancellationToken();
 

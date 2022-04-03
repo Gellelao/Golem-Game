@@ -2,13 +2,16 @@
 
 public static class GolemApiClientFactory
 {
-    public static IGolemApiClient Create(string host, string apiKey)
+    private static readonly string Host = "***REMOVED***";
+    private static readonly string ApiKey = "***REMOVED***";
+
+    public static IGolemApiClient Create()
     {
         var httpClient = new HttpClient
         {
-            BaseAddress = new Uri(host)
+            BaseAddress = new Uri(Host)
         };
-        ConfigureHttpClient(httpClient, host, apiKey);
+        ConfigureHttpClient(httpClient, Host, ApiKey);
 
         return new GolemApiClient(httpClient);
     }
