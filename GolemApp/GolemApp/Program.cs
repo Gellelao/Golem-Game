@@ -1,9 +1,12 @@
-﻿using GolemCore;
+﻿using GolemApp;
+using GolemCore;
 using GolemCore.Models;
 
 Console.WriteLine("Hello, World!");
 
 var client = GolemApiClientFactory.Create();
+
+var view = new ConsoleView(new ConsoleWrapper());
 
 var cancellationToken = new CancellationToken();
 
@@ -40,9 +43,10 @@ foreach (var result in results)
     Console.WriteLine(result);
 }
 
-foreach (var part in parts)
+var shop = new Shop(partsCache);
+foreach (var part in shop.GetPartsForRound(0))
 {
-    Console.WriteLine(part.Name);
+    view.PrintPart(part);
 }
 
 // await client.CreateGolem(new CreateGolemRequest{Item = golem1}, cancellationToken);

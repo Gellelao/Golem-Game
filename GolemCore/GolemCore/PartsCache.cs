@@ -25,4 +25,9 @@ public class PartsCache
 
     throw new KeyNotFoundException($"Part {partId} was not found in the cache");
   }
+
+  public List<Part> GetAllParts()
+  {
+    return parts.Values.ToList();
+  }
 }
