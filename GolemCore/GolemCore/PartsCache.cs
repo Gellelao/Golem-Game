@@ -2,13 +2,21 @@
 
 namespace GolemCore;
 
-public static class PartsCache
+public class PartsCache
 {
-  private static Dictionary<int, Part>? parts = null;
+  private Dictionary<int, Part> parts;
 
-  public static Part Get(int partId)
+  public PartsCache(List<Part> partsList)
   {
-    await PopulateCacheIfNull();
+    parts = new Dictionary<int, Part>();
+    foreach (var part in partsList)
+    {
+      parts.Add(part.Id, part);
+    }
+  }
+
+  public Part Get(int partId)
+  {
     var success = parts.TryGetValue(partId, out var part);
     if (success)
     {
@@ -16,21 +24,5 @@ public static class PartsCache
     }
 
     throw new KeyNotFoundException($"Part {partId} was not found in the cache");
-  }
-
-  private static async Task PopulateCacheIfNull()
-  {
-    if (parts == null)
-    {
-      parts = new Dictionary<int, Part>();
-
-      var client = GolemApiClientFactory.Create();
-      var partsResponse = await client.GetParts(new CancellationToken());
-
-      foreach (var part in partsResponse)
-      {
-
-      }
-    }
   }
 }

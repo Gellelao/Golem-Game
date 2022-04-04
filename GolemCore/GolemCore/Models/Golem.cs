@@ -8,7 +8,7 @@ public class Golem
     public DateTime Timestamp { get; init; } = DateTime.Now;
 
     public string UserId { get; init; }
-    public int[][] Parts { get; init; } = new int[][]
+    public int[][] PartIds { get; init; } = new int[][]
     {
         new int[3],
         new int[3],

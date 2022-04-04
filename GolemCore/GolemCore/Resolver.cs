@@ -5,13 +5,15 @@ namespace GolemCore;
 
 public class Resolver
 {
-  public static List<string> GetOutcome(Golem user, Golem opponent)
+  public static List<string> GetOutcome(Golem user, Golem opponent, PartsCache partsCache)
   {
     var results = new List<string>();
-    var userHealth = SumStat(StatType.Health, user);
-    var userAttack = SumStat(StatType.Attack, user);
-    var opponentHealth = SumStat(StatType.Health, opponent);
-    var opponentAttack = SumStat(StatType.Attack, opponent);
+    var userParser = new GolemParser(user, partsCache);
+    var opponentParser = new GolemParser(opponent, partsCache);
+    var userHealth = userParser.SumStat(StatType.Health);
+    var userAttack = userParser.SumStat(StatType.Attack);
+    var opponentHealth = opponentParser.SumStat(StatType.Health);
+    var opponentAttack = opponentParser.SumStat(StatType.Attack);
 
     results.Add($"User HP: {userHealth}. User ATK: {userAttack}. Opponent HP: {opponentHealth}. Opponent ATK: {opponentAttack}");
 
@@ -25,9 +27,32 @@ public class Resolver
 
     return results;
   }
-
-  private static int SumStat(StatType typeToSum, Golem user)
+  
+  private class GolemParser
   {
-    return (from parts in user.Parts from part in parts from stat in part.Stats where stat.Type == typeToSum select stat.Modifier).Sum();
+    private readonly Golem _golem;
+    private readonly PartsCache _cache;
+    
+    public GolemParser(Golem golem, PartsCache partsCache)
+    {
+      _golem = golem;
+      _cache = partsCache;
+    }
+
+    public int SumStat(StatType typeToSum)
+    {
+      var sum = 0;
+      foreach (var idList in _golem.PartIds)
+      {
+        foreach (var id in idList)
+        {
+          var part = _cache.Get(id);
+          sum += part.Stats.Where(stat => stat.Type == typeToSum).Sum(stat => stat.Modifier);
+        }
+      }
+
+      return sum;
+    }
   }
 }
+
