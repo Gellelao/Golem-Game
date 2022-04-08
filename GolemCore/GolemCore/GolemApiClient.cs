@@ -1,19 +1,20 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using GolemCore.Models;
+using GolemCore.Models.Golem;
 
 namespace GolemCore;
 
 public class GolemApiClient : IGolemApiClient
 {
     private readonly HttpClient _httpClient;
-    private readonly JsonSerializerOptions options;
+    public readonly JsonSerializerOptions Options;
 
     public GolemApiClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
 
-        options = new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null});
+        Options = new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null});
     }
 
     public async Task<List<Golem>> GetGolemSelection(CancellationToken cancellationToken)
@@ -30,11 +31,21 @@ public class GolemApiClient : IGolemApiClient
 
     public async Task CreateGolem(CreateGolemRequest golem, CancellationToken cancellationToken)
     {
-        var result = await _httpClient.PostAsJsonAsync(Constants.PostGolemEndpoint, golem, options, cancellationToken);
+        var result = await _httpClient.PostAsJsonAsync(Constants.PostGolemEndpoint, golem, Options, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
             throw new InvalidOperationException("Failed to post golem");
+        }
+    }
+
+    public async Task UpdateGolem(UpdateRequest update, CancellationToken cancellationToken)
+    {
+        var result = await _httpClient.PutAsJsonAsync(Constants.PostGolemEndpoint, update, Options, cancellationToken);
+
+        if (!result.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("Failed to update golem");
         }
     }
 

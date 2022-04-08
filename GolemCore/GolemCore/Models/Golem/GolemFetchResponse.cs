@@ -1,4 +1,4 @@
-﻿namespace GolemCore.Models;
+﻿namespace GolemCore.Models.Golem;
 
 public class GolemFetchResponse
 {

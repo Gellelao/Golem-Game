@@ -1,5 +1,6 @@
 ﻿using GolemCore.Models;
 using GolemCore.Models.Enums;
+using GolemCore.Models.Golem;
 
 namespace GolemCore;
 
