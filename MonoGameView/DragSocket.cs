@@ -9,7 +9,7 @@ namespace MonoGameView
         {
         }
 
-        public Vector2 GetPositionForDraggable(Draggable item)
+        public Vector2 GetPositionForDraggable(DraggablePart item)
         {
             return new Vector2
             (

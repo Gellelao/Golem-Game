@@ -1,50 +1,57 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using GolemCore;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGameView;
 
-namespace MonoGameCross_PlatformDesktopApplication1
+namespace MonoGameView
 {
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Texture2D _ballTexture;
-        private Vector2 _ballPosition;
-        private float _ballSpeed;
-        private List<Draggable> _draggables;
+        private List<DraggablePart> _draggables;
         private List<DragSocket> _sockets;
-        private Draggable _draggedItem;
+        private DraggablePart _draggedItem;
+        private Shop _shop;
+        private IGolemApiClient _client;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            _draggables = new List<Draggable>();
+            _draggables = new List<DraggablePart>();
             _sockets = new List<DragSocket>();
         }
 
         protected override void Initialize()
         {
-            _ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
-                _graphics.PreferredBackBufferHeight / 2);
-            _ballSpeed = 1000f;
-            
+            _client = GolemApiClientFactory.Create();
             base.Initialize();
         }
 
-        protected override void LoadContent()
+        protected override async void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            var arialFont = Content.Load<SpriteFont>("Arial");
+
+            var parts = await _client.GetParts(new CancellationToken());
+            _shop = new Shop(new PartsCache(parts));
+
+            var partSelection = _shop.GetPartsForRound(0);
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
             
-            for (int i = 50; i < 300; i+=40)
+            for (int i = 0; i < partSelection.Count; i++)
             {
-                _draggables.Add(new Draggable(new Vector2(i, _graphics.PreferredBackBufferHeight / 2), 50, 50, grayTexture));
+                _draggables.Add(new DraggablePart(new Vector2(i*55, _graphics.PreferredBackBufferHeight / 2), 50, 50, grayTexture, arialFont)
+                {
+                    Part = partSelection[i]
+                });
             }
             
             var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
@@ -54,7 +61,6 @@ namespace MonoGameCross_PlatformDesktopApplication1
                 _sockets.Add(new DragSocket(new Vector2(i, _graphics.PreferredBackBufferHeight / 3), 70, 70, blankTexture));
             }
 
-            _ballTexture = Content.Load<Texture2D>("ball");
         }
 
         protected override void Update(GameTime gameTime)

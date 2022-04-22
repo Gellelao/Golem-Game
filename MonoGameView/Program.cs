@@ -1,4 +1,5 @@
 ﻿using System;
+using MonoGameView;
 
 namespace MonoGameCross_PlatformDesktopApplication1
 {

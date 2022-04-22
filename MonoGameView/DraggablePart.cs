@@ -1,17 +1,22 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GolemCore.Models;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace MonoGameView
 {
-    public class Draggable : Region
+    public class DraggablePart : Region
     {
+        private readonly SpriteFont _font;
         private bool _beingDragged;
         private float _xOffsetFromMouse;
         private float _yOffsetFromMouse;
+        
+        public Part Part { get; init; }
 
-        public Draggable(Vector2 position, int height, int width, Texture2D texture) : base(position, height, width, texture)
+        public DraggablePart(Vector2 position, int height, int width, Texture2D texture, SpriteFont font) : base(position, height, width, texture)
         {
+            _font = font;
         }
 
         public void Update(MouseState mouseState)
@@ -37,6 +42,12 @@ namespace MonoGameView
         public void Release()
         {
             _beingDragged = false;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+            spriteBatch.DrawString(_font, Part.Name.Replace(' ', '\n'), Position, Color.White);
         }
     }
 }
