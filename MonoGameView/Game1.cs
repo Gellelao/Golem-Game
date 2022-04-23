@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using GolemCore;
+using GolemCore.Models.Golem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,19 +14,19 @@ namespace MonoGameView
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private List<DraggablePart> _draggables;
-        private List<DragSocket> _sockets;
-        private DraggablePart _draggedItem;
+        private LinkedList<DraggablePart> _draggables;
+        private DraggablePart _draggedPart;
         private Shop _shop;
         private IGolemApiClient _client;
+        private GolemGrid _grid1;
+        private GolemGrid _grid2;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            _draggables = new List<DraggablePart>();
-            _sockets = new List<DragSocket>();
+            _draggables = new LinkedList<DraggablePart>();
         }
 
         protected override void Initialize()
@@ -36,6 +39,19 @@ namespace MonoGameView
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
+            
+
+            var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
+            blankTexture.SetData(new[] { Color.White });
+            
+            var golem1 = new Golem{UserId = 1};
+            var golem2 = new Golem{UserId = 2};
+
+            _grid1 = new GolemGrid(golem1, blankTexture);
+            Constants.SocketDistanceFromLeft = 570;
+            _grid2 = new GolemGrid(golem2, blankTexture);
+            
+            
             var arialFont = Content.Load<SpriteFont>("Arial");
 
             var parts = await _client.GetParts(new CancellationToken());
@@ -46,21 +62,13 @@ namespace MonoGameView
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
             
-            for (int i = 0; i < partSelection.Count; i++)
+            for (var i = 0; i < partSelection.Count; i++)
             {
-                _draggables.Add(new DraggablePart(new Vector2(i*55, _graphics.PreferredBackBufferHeight / 2), 50, 50, grayTexture, arialFont)
+                _draggables.AddFirst(new DraggablePart(new Vector2(50+ i*65, _graphics.PreferredBackBufferHeight-50), 60, 60, grayTexture, arialFont)
                 {
                     Part = partSelection[i]
                 });
             }
-            
-            var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
-            blankTexture.SetData(new[] { Color.White });
-            for (int i = 50; i < 250; i+=90)
-            {
-                _sockets.Add(new DragSocket(new Vector2(i, _graphics.PreferredBackBufferHeight / 3), 70, 70, blankTexture));
-            }
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -82,8 +90,12 @@ namespace MonoGameView
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _sockets.ForEach(d => d.Draw(_spriteBatch));
-            _draggables.ForEach(d => d.Draw(_spriteBatch));
+            _grid1.Draw(_spriteBatch);
+            _grid2.Draw(_spriteBatch);
+            foreach (var draggable in _draggables.Reverse())
+            {
+                draggable.Draw(_spriteBatch);
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -91,38 +103,55 @@ namespace MonoGameView
 
         private void HandleDragging(MouseState mouseState)
         {
-
-            if (_draggedItem == null && mouseState.LeftButton == ButtonState.Pressed)
+            if (_draggedPart == null && mouseState.LeftButton == ButtonState.Pressed)
             {
-                foreach (var draggable in _draggables)
-                {
-                    if (draggable.PointInBounds(mouseState.Position))
-                    {
-                        _draggedItem = draggable;
-                        draggable.Grab(mouseState);
-                        break;
-                    }
-                }
+                AttemptNewDrag(mouseState);
             }
             
             if (mouseState.LeftButton == ButtonState.Released)
             {
-                if (_draggedItem != null)
-                {
-                    foreach (var socket in _sockets)
-                    {
-                        if (socket.PointInBounds(mouseState.Position))
-                        {
-                            _draggedItem.SetPosition(socket.GetPositionForDraggable(_draggedItem));
-                            break;
-                        }
-                    }
-                    _draggedItem.Release();
-                    _draggedItem = null;
-                }
+                ReleaseDraggedPart(mouseState);
             }
             
-            _draggables.ForEach(d => d.Update(mouseState));
+            foreach (var draggable in _draggables)
+            {
+                draggable.Update(mouseState);
+            }
+        }
+
+        private void ReleaseDraggedPart(MouseState mouseState)
+        {
+            if (_draggedPart != null)
+            {
+                _grid1.UnsocketPart(_draggedPart);
+                _grid2.UnsocketPart(_draggedPart);
+
+                _grid1.SocketPartAtMouse(mouseState, _draggedPart);
+                _grid2.SocketPartAtMouse(mouseState, _draggedPart);
+                
+                _draggedPart.Release();
+                _draggedPart = null;
+            }
+        }
+
+        private void AttemptNewDrag(MouseState mouseState)
+        {
+            foreach (var draggable in _draggables)
+            {
+                if (draggable.PointInBounds(mouseState.Position))
+                {
+                    _draggedPart = draggable;
+                    MoveDraggableToFront(draggable);
+                    draggable.Grab(mouseState);
+                    break;
+                }
+            }
+        }
+
+        private void MoveDraggableToFront(DraggablePart draggable)
+        {
+            _draggables.Remove(draggable);
+            _draggables.AddFirst(draggable);
         }
     }
 }
