@@ -43,11 +43,23 @@ public class Resolver
     public int SumStat(StatType typeToSum)
     {
       var sum = 0;
+      List<string> seenParts = new List<string>();
       foreach (var idList in _golem.PartIds)
       {
-        foreach (var id in idList.Where(id => id >= 0))
+        foreach (var id in idList.Where(id => id != "-1"))
         {
-          var part = _cache.Get(id);
+          int idForLookup;
+          if (seenParts.Contains(id)) continue;
+          if (id.Contains('.'))
+          {
+            seenParts.Add(id);
+            idForLookup = int.Parse(id.Split('.')[0]);
+          }
+          else
+          {
+            idForLookup = int.Parse(id);
+          }
+          var part = _cache.Get(idForLookup);
           sum += part.Stats.Where(stat => stat.Type == typeToSum).Sum(stat => stat.Modifier);
         }
       }

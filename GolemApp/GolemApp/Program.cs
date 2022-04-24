@@ -17,9 +17,9 @@ var golem1 = new Golem
     UserId = 1,
     PartIds = new []
     {
-        new []{1, 1, 1},
-        new []{0, 0, 0},
-        new []{1, 0, 1},
+        new []{"1", "1", "1"},
+        new []{"0", "0", "0"},
+        new []{"1", "0", "1"},
     }
 };
 
@@ -28,9 +28,9 @@ var golem2 = new Golem
     UserId = 2,
     PartIds = new []
     {
-        new []{0, 1, 0},
-        new []{0, 0, 0},
-        new []{0, 0, 0},
+        new []{"0", "1", "0"},
+        new []{"0", "0", "0"},
+        new []{"0", "0", "0"},
     }
 };
 
