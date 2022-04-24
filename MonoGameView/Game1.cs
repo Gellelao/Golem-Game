@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using GolemCore;
 using GolemCore.Models.Golem;
@@ -20,6 +21,7 @@ namespace MonoGameView
         private IGolemApiClient _client;
         private GolemGrid _grid1;
         private GolemGrid _grid2;
+        private Button _combatButton;
 
         public Game1()
         {
@@ -38,8 +40,6 @@ namespace MonoGameView
         protected override async void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            
 
             var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
             blankTexture.SetData(new[] { Color.White });
@@ -48,14 +48,23 @@ namespace MonoGameView
             var golem2 = new Golem{UserId = 2};
 
             _grid1 = new GolemGrid(golem1, blankTexture);
-            Constants.SocketDistanceFromLeft = 570;
+            Constants.SocketDistanceFromLeft = 500;
             _grid2 = new GolemGrid(golem2, blankTexture);
             
+            var buttonTexture = new Texture2D(GraphicsDevice, 1, 1);
+            buttonTexture.SetData(new[] { Color.ForestGreen });
+            
+            // Do this now so that its not null by the time Draw() is called
+            _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, null);
             
             var arialFont = Content.Load<SpriteFont>("Arial");
 
             var parts = await _client.GetParts(new CancellationToken());
-            _shop = new Shop(new PartsCache(parts));
+            var partsCache = new PartsCache(parts);
+
+            _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
+            
+            _shop = new Shop(partsCache);
 
             var partSelection = _shop.GetPartsForRound(0);
 
@@ -81,6 +90,7 @@ namespace MonoGameView
                 Exit();
 
             HandleDragging(mouseState);
+            _combatButton.Update(mouseState);
 
             base.Update(gameTime);
         }
@@ -92,6 +102,7 @@ namespace MonoGameView
             _spriteBatch.Begin();
             _grid1.Draw(_spriteBatch);
             _grid2.Draw(_spriteBatch);
+            _combatButton.Draw(_spriteBatch);
             foreach (var draggable in _draggables.Reverse())
             {
                 draggable.Draw(_spriteBatch);
@@ -152,6 +163,16 @@ namespace MonoGameView
         {
             _draggables.Remove(draggable);
             _draggables.AddFirst(draggable);
+        }
+
+        private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
+        {
+            var results = Resolver.GetOutcome(golem1, golem2, cache);
+
+            foreach (var result in results)
+            {
+                Console.WriteLine(result);
+            }
         }
     }
 }

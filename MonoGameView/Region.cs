@@ -18,12 +18,12 @@ namespace MonoGameView
             Texture = texture;
         }
 
-        public bool PointInBounds(Point mousePosition)
+        public bool PointInBounds(Point point)
         {
-            return mousePosition.X > Position.X &&
-                   mousePosition.X < Position.X + Width &&
-                   mousePosition.Y > Position.Y &&
-                   mousePosition.Y < Position.Y + Height;
+            return point.X > Position.X &&
+                   point.X < Position.X + Width &&
+                   point.Y > Position.Y &&
+                   point.Y < Position.Y + Height;
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)

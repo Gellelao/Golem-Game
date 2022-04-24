@@ -45,7 +45,7 @@ public class Resolver
       var sum = 0;
       foreach (var idList in _golem.PartIds)
       {
-        foreach (var id in idList)
+        foreach (var id in idList.Where(id => id >= 0))
         {
           var part = _cache.Get(id);
           sum += part.Stats.Where(stat => stat.Type == typeToSum).Sum(stat => stat.Modifier);
