@@ -11,12 +11,16 @@ namespace MonoGameView
         private bool _beingDragged;
         private float _xOffsetFromMouse;
         private float _yOffsetFromMouse;
-        
+        private Texture2D _invalidTexture;
+        public bool Invalid { get; set; }
+
         public Part Part { get; init; }
 
-        public DraggablePart(Vector2 position, int height, int width, Texture2D texture, SpriteFont font) : base(position, height, width, texture)
+        public DraggablePart(Vector2 position, int height, int width, Texture2D texture, SpriteFont font,
+            Texture2D invalidTexture) : base(position, height, width, texture)
         {
             _font = font;
+            _invalidTexture = invalidTexture;
         }
 
         public void Update(MouseState mouseState)
@@ -46,7 +50,8 @@ namespace MonoGameView
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch);
+            var texture = Invalid ? _invalidTexture : Texture;
+            spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color.White);
             spriteBatch.DrawString(_font, Part.Name.Replace(' ', '\n'), Position, Color.White);
         }
     }

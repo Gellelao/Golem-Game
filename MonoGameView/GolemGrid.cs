@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GolemCore.Models.Golem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,7 @@ public class GolemGrid
     private Golem _golem;
     private List<PartSocket> _sockets;
 
-    public GolemGrid(Golem golem, Texture2D socketTexture)
+    public GolemGrid(Golem golem, Texture2D blankTexture, Texture2D highlightTexture)
     {
         _golem = golem;
         _sockets = new List<PartSocket>();
@@ -21,7 +22,7 @@ public class GolemGrid
         {
             for(var y = 0; y < _golem.PartIds[x].Length; y++)
             {
-                _sockets.Add(new PartSocket(new Vector2(x, y), 70, 70, socketTexture));
+                _sockets.Add(new PartSocket(new Vector2(x, y), 70, 70, blankTexture, highlightTexture));
             }
         }
     }
@@ -62,5 +63,23 @@ public class GolemGrid
             UpdateGolem();
             break;
         }
+    }
+
+    public bool HighlightCandidateSockets(Point mousePosition)
+    {
+        var socket = GetSocketUnderMouse(mousePosition);
+        if (socket == null) return false;
+        socket.Highlight = true;
+        return true;
+    }
+
+    public void ClearHighlights()
+    {
+        _sockets.ForEach(s => s.Highlight = false);
+    }
+
+    private PartSocket GetSocketUnderMouse(Point mousePosition)
+    {
+        return _sockets.FirstOrDefault(socket => socket.PointInBounds(mousePosition));
     }
 }

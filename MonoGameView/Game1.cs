@@ -43,13 +43,15 @@ namespace MonoGameView
 
             var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
             blankTexture.SetData(new[] { Color.White });
+            var yellowTexture = new Texture2D(GraphicsDevice, 1, 1);
+            yellowTexture.SetData(new[] { Color.LightYellow });
             
             var golem1 = new Golem{UserId = 1};
             var golem2 = new Golem{UserId = 2};
 
-            _grid1 = new GolemGrid(golem1, blankTexture);
+            _grid1 = new GolemGrid(golem1, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 500;
-            _grid2 = new GolemGrid(golem2, blankTexture);
+            _grid2 = new GolemGrid(golem2, blankTexture, yellowTexture);
             
             var buttonTexture = new Texture2D(GraphicsDevice, 1, 1);
             buttonTexture.SetData(new[] { Color.ForestGreen });
@@ -71,9 +73,12 @@ namespace MonoGameView
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
             
+            var redTexture = new Texture2D(GraphicsDevice, 1, 1);
+            redTexture.SetData(new[] { Color.IndianRed });
+            
             for (var i = 0; i < partSelection.Count; i++)
             {
-                _draggables.AddFirst(new DraggablePart(new Vector2(50+ i*65, _graphics.PreferredBackBufferHeight-50), 60, 60, grayTexture, arialFont)
+                _draggables.AddFirst(new DraggablePart(new Vector2(50+ i*65, _graphics.PreferredBackBufferHeight-50), 60, 60, grayTexture, arialFont, redTexture)
                 {
                     Part = partSelection[i]
                 });
@@ -114,6 +119,14 @@ namespace MonoGameView
 
         private void HandleDragging(MouseState mouseState)
         {
+            if (_draggedPart != null)
+            {
+                _grid1.ClearHighlights();
+                _grid2.ClearHighlights();
+                _draggedPart.Invalid = !_grid1.HighlightCandidateSockets(mouseState.Position) &&
+                !_grid2.HighlightCandidateSockets(mouseState.Position);
+            }
+            
             if (_draggedPart == null && mouseState.LeftButton == ButtonState.Pressed)
             {
                 AttemptNewDrag(mouseState);
@@ -140,7 +153,11 @@ namespace MonoGameView
                 _grid1.SocketPartAtMouse(mouseState, _draggedPart);
                 _grid2.SocketPartAtMouse(mouseState, _draggedPart);
                 
+                _grid1.ClearHighlights();
+                _grid2.ClearHighlights();
+                
                 _draggedPart.Release();
+                _draggedPart.Invalid = false;
                 _draggedPart = null;
             }
         }
