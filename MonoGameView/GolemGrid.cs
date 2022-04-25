@@ -36,6 +36,7 @@ public class GolemGrid
     {
         foreach (var socket in _sockets)
         {
+            // TODO: Why do X and Y need to be flipped
             _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
         }
         Console.WriteLine(_golem);
@@ -68,7 +69,7 @@ public class GolemGrid
     public bool HighlightCandidateSockets(Point mousePosition)
     {
         var socket = GetSocketUnderMouse(mousePosition);
-        if (socket == null) return false;
+        if (socket == null || socket.StoredPart != null) return false;
         socket.Highlight = true;
         return true;
     }

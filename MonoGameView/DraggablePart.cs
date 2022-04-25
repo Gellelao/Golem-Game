@@ -11,13 +11,13 @@ namespace MonoGameView
         private bool _beingDragged;
         private float _xOffsetFromMouse;
         private float _yOffsetFromMouse;
-        private Texture2D _invalidTexture;
+        private readonly Texture2D _invalidTexture;
         public bool Invalid { get; set; }
 
         public Part Part { get; init; }
 
-        public DraggablePart(Vector2 position, int height, int width, Texture2D texture, SpriteFont font,
-            Texture2D invalidTexture) : base(position, height, width, texture)
+        public DraggablePart(Vector2 position, int size, Texture2D texture, SpriteFont font,
+            Texture2D invalidTexture) : base(position, size, size, texture)
         {
             _font = font;
             _invalidTexture = invalidTexture;

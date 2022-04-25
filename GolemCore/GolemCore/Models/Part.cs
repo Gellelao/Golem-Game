@@ -10,4 +10,11 @@ public class Part
   public PartMaterial Material { get; init; }
   public PartType Type { get; init; }
   public List<Stat> Stats { get; set; }
+  public bool[][] Shape { get; init; } =
+  {
+    new []{true, false, false, false},
+    new []{false, false, false, false},
+    new []{false, false, false, false},
+    new []{false, false, false, false}
+  };
 }

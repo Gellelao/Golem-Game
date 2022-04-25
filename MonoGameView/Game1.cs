@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using GolemCore;
 using GolemCore.Models.Golem;
@@ -15,7 +14,7 @@ namespace MonoGameView
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private LinkedList<DraggablePart> _draggables;
+        private readonly LinkedList<DraggablePartCluster> _clusters;
         private DraggablePart _draggedPart;
         private Shop _shop;
         private IGolemApiClient _client;
@@ -28,7 +27,7 @@ namespace MonoGameView
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            _draggables = new LinkedList<DraggablePart>();
+            _clusters = new LinkedList<DraggablePartCluster>();
         }
 
         protected override void Initialize()
@@ -68,7 +67,7 @@ namespace MonoGameView
             
             _shop = new Shop(partsCache);
 
-            var partSelection = _shop.GetPartsForRound(0);
+            var partSelection = _shop.GetPartsForRound(1);
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -78,10 +77,7 @@ namespace MonoGameView
             
             for (var i = 0; i < partSelection.Count; i++)
             {
-                _draggables.AddFirst(new DraggablePart(new Vector2(50+ i*65, _graphics.PreferredBackBufferHeight-50), 60, 60, grayTexture, arialFont, redTexture)
-                {
-                    Part = partSelection[i]
-                });
+                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, arialFont, redTexture, partSelection[i]));
             }
         }
 
@@ -108,9 +104,9 @@ namespace MonoGameView
             _grid1.Draw(_spriteBatch);
             _grid2.Draw(_spriteBatch);
             _combatButton.Draw(_spriteBatch);
-            foreach (var draggable in _draggables.Reverse())
+            foreach (var cluster in _clusters.Reverse())
             {
-                draggable.Draw(_spriteBatch);
+                cluster.Draw(_spriteBatch);
             }
             _spriteBatch.End();
 
@@ -137,7 +133,7 @@ namespace MonoGameView
                 ReleaseDraggedPart(mouseState);
             }
             
-            foreach (var draggable in _draggables)
+            foreach (var draggable in _clusters)
             {
                 draggable.Update(mouseState);
             }
@@ -164,22 +160,22 @@ namespace MonoGameView
 
         private void AttemptNewDrag(MouseState mouseState)
         {
-            foreach (var draggable in _draggables)
-            {
-                if (draggable.PointInBounds(mouseState.Position))
-                {
-                    _draggedPart = draggable;
-                    MoveDraggableToFront(draggable);
-                    draggable.Grab(mouseState);
-                    break;
-                }
-            }
+            // foreach (var draggable in _clusters)
+            // {
+            //     if (draggable.PointInBounds(mouseState.Position))
+            //     {
+            //         _draggedPart = draggable;
+            //         MoveDraggableToFront(draggable);
+            //         draggable.Grab(mouseState);
+            //         break;
+            //     }
+            // }
         }
 
         private void MoveDraggableToFront(DraggablePart draggable)
         {
-            _draggables.Remove(draggable);
-            _draggables.AddFirst(draggable);
+            // _clusters.Remove(draggable);
+            // _clusters.AddFirst(draggable);
         }
 
         private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
