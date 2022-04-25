@@ -1,16 +1,12 @@
 ﻿using GolemCore.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace MonoGameView
 {
     public class DraggablePart : Region
     {
         private readonly SpriteFont _font;
-        private bool _beingDragged;
-        private float _xOffsetFromMouse;
-        private float _yOffsetFromMouse;
         private readonly Texture2D _invalidTexture;
         public bool Invalid { get; set; }
 
@@ -23,29 +19,9 @@ namespace MonoGameView
             _invalidTexture = invalidTexture;
         }
 
-        public void Update(MouseState mouseState)
-        {
-            if (_beingDragged)
-            {
-                Position = new Vector2(mouseState.X - _xOffsetFromMouse, mouseState.Y - _yOffsetFromMouse);
-            }
-        }
-
-        public void Grab(MouseState mouseState)
-        {
-            _beingDragged = true;
-            _xOffsetFromMouse = mouseState.X - Position.X;
-            _yOffsetFromMouse = mouseState.Y - Position.Y;
-        }
-
         public void SetPosition(Vector2 newPos)
         {
             Position = newPos;
-        }
-
-        public void Release()
-        {
-            _beingDragged = false;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

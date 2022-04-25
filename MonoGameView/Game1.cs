@@ -15,7 +15,7 @@ namespace MonoGameView
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private readonly LinkedList<DraggablePartCluster> _clusters;
-        private DraggablePart _draggedPart;
+        private DraggablePartCluster _draggedCluster;
         private Shop _shop;
         private IGolemApiClient _client;
         private GolemGrid _grid1;
@@ -115,15 +115,15 @@ namespace MonoGameView
 
         private void HandleDragging(MouseState mouseState)
         {
-            if (_draggedPart != null)
+            if (_draggedCluster != null)
             {
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
-                _draggedPart.Invalid = !_grid1.HighlightCandidateSockets(mouseState.Position) &&
-                !_grid2.HighlightCandidateSockets(mouseState.Position);
+                //_draggedCluster.Invalid = !_grid1.HighlightCandidateSockets(mouseState.Position) &&
+                //!_grid2.HighlightCandidateSockets(mouseState.Position);
             }
             
-            if (_draggedPart == null && mouseState.LeftButton == ButtonState.Pressed)
+            if (_draggedCluster == null && mouseState.LeftButton == ButtonState.Pressed)
             {
                 AttemptNewDrag(mouseState);
             }
@@ -141,41 +141,40 @@ namespace MonoGameView
 
         private void ReleaseDraggedPart(MouseState mouseState)
         {
-            if (_draggedPart != null)
+            if (_draggedCluster != null)
             {
-                _grid1.UnsocketPart(_draggedPart);
-                _grid2.UnsocketPart(_draggedPart);
-
-                _grid1.SocketPartAtMouse(mouseState, _draggedPart);
-                _grid2.SocketPartAtMouse(mouseState, _draggedPart);
+                _draggedCluster.Release();
+                _grid1.UnsocketPartsOfCluster(_draggedCluster);
+                _grid2.UnsocketPartsOfCluster(_draggedCluster);
                 
+                _grid1.SocketClusterAtMouse(mouseState, _draggedCluster);
+                //_grid2.SocketClusterAtMouse(mouseState, _draggedCluster);
+
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
                 
-                _draggedPart.Release();
-                _draggedPart.Invalid = false;
-                _draggedPart = null;
+                //_draggedCluster.Invalid = false;
+                _draggedCluster = null;
             }
         }
 
         private void AttemptNewDrag(MouseState mouseState)
         {
-            // foreach (var draggable in _clusters)
-            // {
-            //     if (draggable.PointInBounds(mouseState.Position))
-            //     {
-            //         _draggedPart = draggable;
-            //         MoveDraggableToFront(draggable);
-            //         draggable.Grab(mouseState);
-            //         break;
-            //     }
-            // }
+            foreach (var cluster in _clusters)
+            {
+                if (cluster.GetDraggableUnderMouse(mouseState.Position) == null) continue;
+                
+                _draggedCluster = cluster;
+                MoveClusterToFront(cluster);
+                cluster.Grab(mouseState);
+                break;
+            }
         }
 
-        private void MoveDraggableToFront(DraggablePart draggable)
+        private void MoveClusterToFront(DraggablePartCluster cluster)
         {
-            // _clusters.Remove(draggable);
-            // _clusters.AddFirst(draggable);
+            _clusters.Remove(cluster);
+            _clusters.AddFirst(cluster);
         }
 
         private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
