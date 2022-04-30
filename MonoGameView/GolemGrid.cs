@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using GolemCore;
 using GolemCore.Models.Golem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -65,28 +67,44 @@ public class GolemGrid
 
     public void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
     {
+        var candidatePairs = GetCandidates(mouseState.Position, cluster, out var clusterPosition);
+
+        if (candidatePairs.Count > 0 && candidatePairs.All(kvp => kvp.Value != null))
+        {
+            foreach (var kvp in candidatePairs)
+            {
+                kvp.Value.StorePart(kvp.Key);
+            }
+            cluster.SetPosition(clusterPosition);
+        }
+    }
+
+    private Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)
+    {
+        var candidatePairs = new Dictionary<DraggablePart, PartSocket>();
+        clusterPosition = new Vector2();
+        
         Vector2? socketUnderMouseCoords = null;
         for (var x = 0; x < _sockets.Length; x++)
         {
             for (var y = 0; y < _sockets[x].Length; y++)
             {
-                if (_sockets[x][y].PointInBounds(mouseState.Position))
+                if (_sockets[x][y].PointInBounds(mousePosition))
                 {
                     socketUnderMouseCoords = new Vector2(x, y);
                 }
             }
         }
 
-        // If mouse not over a socket, nothing to do here
+        // If mouse not over a socket, all parts should be invalid.
         if (socketUnderMouseCoords == null)
         {
-            return;
+            return candidatePairs;
         }
 
-        var partUnderMouse = cluster.GetDraggableUnderMouse(mouseState.Position);
+        var partUnderMouse = cluster.GetDraggableUnderMouse(mousePosition);
         var shapeCoords = cluster.GetCoordsForPart(partUnderMouse);
-
-        Dictionary<DraggablePart, PartSocket> candidatePairs = new Dictionary<DraggablePart, PartSocket>();
+        
         for (var x = 0; x < _sockets.Length; x++)
         {
             for (var y = 0; y < _sockets[x].Length; y++)
@@ -97,8 +115,6 @@ public class GolemGrid
                     var offsetX = x + (int) socketUnderMouseCoords.Value.X - (int) shapeCoords.X;
                     var offsetY = y + (int) socketUnderMouseCoords.Value.Y - (int) shapeCoords.Y;
 
-                    if (x == 0 && y == 0) cluster.SetPosition(_sockets[offsetX][offsetY].Position);
-                    
                     // This piece doesn't fit, so indicate that with a null key
                     if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length)
                     {
@@ -107,42 +123,40 @@ public class GolemGrid
                     else
                     {
                         candidatePairs.Add(draggableToCheck, _sockets[offsetX][offsetY]);
+                        if (x == 0 && y == 0) clusterPosition = _sockets[offsetX][offsetY].Position;
                     }
                 }
             }
         }
 
-        if (candidatePairs.All(kvp => kvp.Value != null))
-        {
-            foreach (var kvp in candidatePairs)
-            {
-                kvp.Value.StorePart(kvp.Key);
-            }
-        }
-        else
-        {
-            throw new NoNullAllowedException("A part was outside bounds");
-        }
-
-    }
-
-    public bool HighlightCandidateSockets(Point mousePosition)
-    {
-        return false;
-        // var socket = GetSocketUnderMouse(mousePosition);
-        // if (socket == null || socket.StoredPart != null) return false;
-        // socket.Highlight = true;
-        // return true;
+        return candidatePairs;
     }
 
     public void ClearHighlights()
     {
-       // _sockets.ForEach(s => s.Highlight = false);
+        foreach (var line in _sockets)
+        {
+            foreach (var socket in line)
+            {
+                socket.Highlight = false;
+            }
+        }
     }
 
-    private PartSocket GetSocketUnderMouse(Point mousePosition)
+    public void DisplayValidation(Point mouseStatePosition, DraggablePartCluster cluster)
     {
-        return null;
-        //return _sockets.FirstOrDefault(socket => socket.PointInBounds(mousePosition));
+        var candidates = GetCandidates(mouseStatePosition, cluster, out _);
+        foreach (var (part, socket) in candidates)
+        {
+            if (socket == null)
+            {
+                part.Invalid = true;
+            }
+            else
+            {
+                part.Invalid = false;
+                socket.Highlight = true;
+            }
+        }
     }
 }

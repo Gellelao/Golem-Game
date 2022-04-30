@@ -132,4 +132,15 @@ public class DraggablePartCluster
     {
         _position = position;
     }
+
+    public void ClearInvalidDisplay()
+    {
+        foreach (var line in _draggableParts)
+        {
+            foreach (var part in line.Where(p => p != null))
+            {
+                part.Invalid = false;
+            }
+        }
+    }
 }

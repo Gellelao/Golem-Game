@@ -44,7 +44,7 @@ namespace MonoGameView
             var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
             blankTexture.SetData(new[] { Color.White });
             var yellowTexture = new Texture2D(GraphicsDevice, 1, 1);
-            yellowTexture.SetData(new[] { Color.LightYellow });
+            yellowTexture.SetData(new[] { Color.Yellow });
             
             var golem1 = new Golem{UserId = 1};
             var golem2 = new Golem{UserId = 2};
@@ -121,8 +121,7 @@ namespace MonoGameView
             {
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
-                //_draggedCluster.Invalid = !_grid1.HighlightCandidateSockets(mouseState.Position) &&
-                //!_grid2.HighlightCandidateSockets(mouseState.Position);
+                _grid1.DisplayValidation(mouseState.Position, _draggedCluster);
             }
             
             if (_draggedCluster == null && mouseState.LeftButton == ButtonState.Pressed)
@@ -155,7 +154,7 @@ namespace MonoGameView
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
                 
-                //_draggedCluster.Invalid = false;
+                _draggedCluster.ClearInvalidDisplay();
                 _draggedCluster = null;
             }
         }
