@@ -43,12 +43,15 @@ public class GolemGrid
 
     private void UpdateGolem()
     {
-        // foreach (var socket in _sockets)
-        // {
-        //     // TODO: Why do X and Y need to be flipped
-        //     _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
-        // }
-        // Console.WriteLine(_golem);
+        foreach (var line in _sockets)
+        {
+            foreach (var socket in line)
+            {
+                // TODO: Why do X and Y need to be flipped
+                _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
+            }
+        }
+        Console.WriteLine(_golem);
     }
 
     public void UnsocketPartsOfCluster(DraggablePartCluster cluster)
@@ -116,7 +119,7 @@ public class GolemGrid
                     var offsetY = y + (int) socketUnderMouseCoords.Value.Y - (int) shapeCoords.Y;
 
                     // This piece doesn't fit, so indicate that with a null key
-                    if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length)
+                    if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length || _sockets[offsetX][offsetY].StoredPart != null)
                     {
                         candidatePairs.Add(draggableToCheck, null);
                     }

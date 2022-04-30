@@ -122,6 +122,7 @@ namespace MonoGameView
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
                 _grid1.DisplayValidation(mouseState.Position, _draggedCluster);
+                _grid2.DisplayValidation(mouseState.Position, _draggedCluster);
             }
             
             if (_draggedCluster == null && mouseState.LeftButton == ButtonState.Pressed)
@@ -145,11 +146,11 @@ namespace MonoGameView
             if (_draggedCluster != null)
             {
                 _draggedCluster.Release();
-                _grid1.UnsocketPartsOfCluster(_draggedCluster);
-                _grid2.UnsocketPartsOfCluster(_draggedCluster);
+                //_grid1.UnsocketPartsOfCluster(_draggedCluster);
+                //_grid2.UnsocketPartsOfCluster(_draggedCluster);
                 
                 _grid1.SocketClusterAtMouse(mouseState, _draggedCluster);
-                //_grid2.SocketClusterAtMouse(mouseState, _draggedCluster);
+                _grid2.SocketClusterAtMouse(mouseState, _draggedCluster);
 
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
@@ -166,6 +167,10 @@ namespace MonoGameView
                 if (cluster.GetDraggableUnderMouse(mouseState.Position) == null) continue;
                 
                 _draggedCluster = cluster;
+                
+                _grid1.UnsocketPartsOfCluster(_draggedCluster);
+                _grid2.UnsocketPartsOfCluster(_draggedCluster);
+                
                 MoveClusterToFront(cluster);
                 cluster.Grab(mouseState);
                 break;
