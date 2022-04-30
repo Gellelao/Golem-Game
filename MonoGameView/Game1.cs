@@ -68,7 +68,7 @@ namespace MonoGameView
             
             _shop = new Shop(partsCache);
 
-            var partSelection = _shop.GetPartsForRound(1);
+            var partSelection = _shop.GetPartsForRound(2);
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -146,8 +146,6 @@ namespace MonoGameView
             if (_draggedCluster != null)
             {
                 _draggedCluster.Release();
-                //_grid1.UnsocketPartsOfCluster(_draggedCluster);
-                //_grid2.UnsocketPartsOfCluster(_draggedCluster);
                 
                 _grid1.SocketClusterAtMouse(mouseState, _draggedCluster);
                 _grid2.SocketClusterAtMouse(mouseState, _draggedCluster);

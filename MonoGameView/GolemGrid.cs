@@ -79,6 +79,7 @@ public class GolemGrid
                 kvp.Value.StorePart(kvp.Key);
             }
             cluster.SetPosition(clusterPosition);
+            UpdateGolem();
         }
     }
 
@@ -113,20 +114,26 @@ public class GolemGrid
             for (var y = 0; y < _sockets[x].Length; y++)
             {
                 var draggableToCheck = cluster.GetDraggableAtCoords(x, y);
-                if (draggableToCheck != null)
-                {
-                    var offsetX = x + (int) socketUnderMouseCoords.Value.X - (int) shapeCoords.X;
-                    var offsetY = y + (int) socketUnderMouseCoords.Value.Y - (int) shapeCoords.Y;
 
-                    // This piece doesn't fit, so indicate that with a null key
-                    if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length || _sockets[offsetX][offsetY].StoredPart != null)
+                var offsetX = x + (int) socketUnderMouseCoords.Value.X - (int) shapeCoords.X;
+                var offsetY = y + (int) socketUnderMouseCoords.Value.Y - (int) shapeCoords.Y;
+
+                // If there is a draggablePart at these indices, and it's either out of bounds or the socked it occupied
+                // then mark that part as invalid using a null value in the dictionary
+                if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length ||
+                    (draggableToCheck != null && _sockets[offsetX][offsetY].StoredPart != null))
+                {
+                    if (draggableToCheck != null)
                     {
                         candidatePairs.Add(draggableToCheck, null);
                     }
-                    else
+                }
+                else
+                {
+                    if (x == 0 && y == 0) clusterPosition = _sockets[offsetX][offsetY].Position;
+                    if (draggableToCheck != null)
                     {
                         candidatePairs.Add(draggableToCheck, _sockets[offsetX][offsetY]);
-                        if (x == 0 && y == 0) clusterPosition = _sockets[offsetX][offsetY].Position;
                     }
                 }
             }
