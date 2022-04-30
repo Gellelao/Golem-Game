@@ -83,8 +83,7 @@ public class DraggablePartCluster
                 if (part.PointInBounds(mousePosition)) return part;
             }
         }
-
-        Console.WriteLine($"GetDraggableUnderMouse could not find a part at mouse {mousePosition.X},{mousePosition.Y}");
+        
         return null;
     }
     
@@ -110,23 +109,12 @@ public class DraggablePartCluster
 
     public Vector2 GetCoordsForPart(DraggablePart part)
     {
-        if (part == null)
-        {
-            Console.WriteLine($"     Part is NULL ????");
-        }
-        else
-        {
-            Console.WriteLine($"     Looking for part {part.Part.Id}");
-        }
         for (var x = 0; x < _draggableParts.Length; x++)
         {
-            Console.WriteLine();
             for (var y = 0; y < _draggableParts[x].Length; y++)
             {
-                Console.WriteLine($"[{(_draggableParts[x][y] == null ? " " : _draggableParts[x][y].Part.Id)}]");
                 if (_draggableParts[x][y] == part)
                 {
-                    Console.WriteLine($"Found at {x},{y}");
                     return new Vector2(x, y);
                 }
             }

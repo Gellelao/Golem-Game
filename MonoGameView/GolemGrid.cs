@@ -65,17 +65,6 @@ public class GolemGrid
 
     public void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
     {
-        // foreach (var socket in _sockets)
-        // {
-        //     if (socket.StoredPart != null) continue;
-        //     if (!socket.PointInBounds(mouseState.Position)) continue;
-        //             
-        //     socket.StorePart(part);
-        //     UpdateGolem();
-        //     break;
-        // }
-        Console.WriteLine("======================");
-
         Vector2? socketUnderMouseCoords = null;
         for (var x = 0; x < _sockets.Length; x++)
         {
@@ -84,7 +73,6 @@ public class GolemGrid
                 if (_sockets[x][y].PointInBounds(mouseState.Position))
                 {
                     socketUnderMouseCoords = new Vector2(x, y);
-                    Console.WriteLine($"socket under mouse coords at {x},{y}");
                 }
             }
         }
@@ -92,13 +80,11 @@ public class GolemGrid
         // If mouse not over a socket, nothing to do here
         if (socketUnderMouseCoords == null)
         {
-            Console.WriteLine("Mouse not over socket, returning");
             return;
         }
 
         var partUnderMouse = cluster.GetDraggableUnderMouse(mouseState.Position);
         var shapeCoords = cluster.GetCoordsForPart(partUnderMouse);
-        Console.WriteLine($"Shape coords: {shapeCoords.X},{shapeCoords.Y}");
 
         Dictionary<DraggablePart, PartSocket> candidatePairs = new Dictionary<DraggablePart, PartSocket>();
         for (var x = 0; x < _sockets.Length; x++)
@@ -106,7 +92,6 @@ public class GolemGrid
             for (var y = 0; y < _sockets[x].Length; y++)
             {
                 var draggableToCheck = cluster.GetDraggableAtCoords(x, y);
-                Console.WriteLine($"checking draggable at {x},{y}");
                 if (draggableToCheck != null)
                 {
                     var offsetX = x + (int) socketUnderMouseCoords.Value.X - (int) shapeCoords.X;
@@ -117,12 +102,10 @@ public class GolemGrid
                     // This piece doesn't fit, so indicate that with a null key
                     if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length)
                     {
-                        Console.WriteLine($"piece does not fit (offsetX {offsetX}, offsetY {offsetY})");
                         candidatePairs.Add(draggableToCheck, null);
                     }
                     else
                     {
-                        Console.WriteLine($"piece fits! (offsetX {offsetX}, offsetY {offsetY})");
                         candidatePairs.Add(draggableToCheck, _sockets[offsetX][offsetY]);
                     }
                 }

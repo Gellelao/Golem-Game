@@ -109,9 +109,7 @@ namespace MonoGameView
             {
                 cluster.Draw(_spriteBatch);
             }
-
-            var mouseState = Mouse.GetState();
-            _spriteBatch.DrawString(_arialFont, $"{mouseState.X},{mouseState.Y}", new Vector2(0,0), Color.White);
+            
             _spriteBatch.End();
 
             base.Draw(gameTime);
