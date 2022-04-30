@@ -15,11 +15,13 @@ public class DraggablePartCluster
     private float _xOffsetFromMouse;
     private float _yOffsetFromMouse;
     private Vector2 _position;
+    private readonly Texture2D _redTexture;
 
     public DraggablePartCluster(Vector2 position, Texture2D grayTexture, SpriteFont arialFont, Texture2D redTexture, Part part)
     {
         _position = position;
         _draggableParts = new DraggablePart[part.Shape.Length][];
+        _redTexture = redTexture;
         for (var x = 0; x < part.Shape.Length; x++)
         {
             for (var y = 0; y < part.Shape[x].Length; y++)
@@ -27,7 +29,6 @@ public class DraggablePartCluster
                 _draggableParts[y] ??= new DraggablePart[part.Shape[y].Length];
                 if (part.Shape[x][y])
                 {
-                    Console.WriteLine($"Creating {part.Name} at {position.X + y * Constants.PartSize},{position.Y + x * Constants.PartSize}");
                     _draggableParts[x][y] = new DraggablePart(new Vector2(position.X + x * Constants.PartSize, position.Y + y * Constants.PartSize),
                         Constants.PartSize, grayTexture, arialFont, redTexture)
                     {
@@ -51,6 +52,7 @@ public class DraggablePartCluster
                 part.Draw(spriteBatch);
             }
         }
+        spriteBatch.Draw(_redTexture, _position, new Rectangle((int)_position.X, (int)_position.Y, 10, 10), Color.White);
     }
 
     public void Update(MouseState mouseState)
@@ -82,6 +84,7 @@ public class DraggablePartCluster
             }
         }
 
+        Console.WriteLine($"GetDraggableUnderMouse could not find a part at mouse {mousePosition.X},{mousePosition.Y}");
         return null;
     }
     
@@ -96,6 +99,8 @@ public class DraggablePartCluster
     public void Release()
     {
         _beingDragged = false;
+        _xOffsetFromMouse = 0;
+        _yOffsetFromMouse = 0;
     }
 
     public bool Contains(DraggablePart partToCheck)
@@ -105,12 +110,23 @@ public class DraggablePartCluster
 
     public Vector2 GetCoordsForPart(DraggablePart part)
     {
+        if (part == null)
+        {
+            Console.WriteLine($"     Part is NULL ????");
+        }
+        else
+        {
+            Console.WriteLine($"     Looking for part {part.Part.Id}");
+        }
         for (var x = 0; x < _draggableParts.Length; x++)
         {
+            Console.WriteLine();
             for (var y = 0; y < _draggableParts[x].Length; y++)
             {
+                Console.WriteLine($"[{(_draggableParts[x][y] == null ? " " : _draggableParts[x][y].Part.Id)}]");
                 if (_draggableParts[x][y] == part)
                 {
+                    Console.WriteLine($"Found at {x},{y}");
                     return new Vector2(x, y);
                 }
             }
@@ -122,5 +138,10 @@ public class DraggablePartCluster
     public DraggablePart GetDraggableAtCoords(int x, int y)
     {
         return _draggableParts[x][y];
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        _position = position;
     }
 }

@@ -21,6 +21,7 @@ namespace MonoGameView
         private GolemGrid _grid1;
         private GolemGrid _grid2;
         private Button _combatButton;
+        private SpriteFont _arialFont;
 
         public Game1()
         {
@@ -58,7 +59,7 @@ namespace MonoGameView
             // Do this now so that its not null by the time Draw() is called
             _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, null);
             
-            var arialFont = Content.Load<SpriteFont>("Arial");
+            _arialFont = Content.Load<SpriteFont>("Arial");
 
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
@@ -77,7 +78,7 @@ namespace MonoGameView
             
             for (var i = 0; i < partSelection.Count; i++)
             {
-                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, arialFont, redTexture, partSelection[i]));
+                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
             }
         }
 
@@ -108,6 +109,9 @@ namespace MonoGameView
             {
                 cluster.Draw(_spriteBatch);
             }
+
+            var mouseState = Mouse.GetState();
+            _spriteBatch.DrawString(_arialFont, $"{mouseState.X},{mouseState.Y}", new Vector2(0,0), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -133,9 +137,9 @@ namespace MonoGameView
                 ReleaseDraggedPart(mouseState);
             }
             
-            foreach (var draggable in _clusters)
+            foreach (var cluster in _clusters)
             {
-                draggable.Update(mouseState);
+                cluster.Update(mouseState);
             }
         }
 

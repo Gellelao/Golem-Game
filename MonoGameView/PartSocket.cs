@@ -48,6 +48,7 @@ namespace MonoGameView
         {
             var texture = Highlight ? _highlightTexture : Texture;
             spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color.White);
+            spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X+2, (int)Position.Y+2, Width-4, Height-4), Color.MintCream);
         }
     }
 }
