@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GolemCore.Models;
 using Microsoft.Xna.Framework;
@@ -10,7 +9,7 @@ namespace MonoGameView;
 
 public class DraggablePartCluster
 {
-    private readonly DraggablePart[][] _draggableParts;
+    private DraggablePart[][] _draggableParts;
     private bool _beingDragged;
     private float _xOffsetFromMouse;
     private float _yOffsetFromMouse;
@@ -142,5 +141,66 @@ public class DraggablePartCluster
                 part.Invalid = false;
             }
         }
+    }
+
+    public void Rotate()
+    {
+        var rotated = RotateArray(_draggableParts);
+        var minimalArray = TrimUnusedRowsColumns(rotated);
+        _draggableParts = minimalArray;
+    }
+
+    private DraggablePart[][] RotateArray(DraggablePart[][] draggableParts)
+    {
+        var height = draggableParts.Length;
+        var width = draggableParts[0].Length; // Assuming square grids here
+        var newArray = new DraggablePart[height][];
+
+        for (var y=height-1;y>=0;--y)
+        {
+            for (var x=0;x<width;++x)
+            {
+                newArray[x] ??= new DraggablePart[width];
+                newArray[x][height-1-y] = draggableParts[y][x];
+            }
+        }
+
+        return newArray;
+    }
+
+    private DraggablePart[][] TrimUnusedRowsColumns(DraggablePart[][] draggableParts)
+    {
+        // while first row is empty, copy to a new array starting from the second row
+        // repeat for columns
+        var height = draggableParts.Length;
+        var width = draggableParts[0].Length; // Assuming square grids here
+        var newArray = new DraggablePart[height][];
+
+        int y;
+        int x;
+
+        // Find out where the cluster starts in the original array:
+        for (y = 0; y < height; y++)
+        {
+            if (draggableParts[y].Any(p => p != null)) break;
+        }
+        for (x = 0; x < width; x++)
+        {
+            if(draggableParts.Select(row  => row[x]).Any(p => p != null)) break;
+        }
+        
+        // Copy pieces from that index in the original, starting from zero in the new array
+        for (var i = 0; i < height; i++)
+        {
+            for (var j = 0; j < width; j++)
+            {
+                newArray[j] ??= new DraggablePart[width];
+                if(y+i >= height || x+j >= width) continue;
+                var part = draggableParts[y + i][x + j];
+                newArray[i][j] = part;
+            }
+        }
+        
+        return newArray;
     }
 }

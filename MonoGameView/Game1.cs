@@ -22,6 +22,7 @@ namespace MonoGameView
         private GolemGrid _grid2;
         private Button _combatButton;
         private SpriteFont _arialFont;
+        private bool _rightMousePressed;
 
         public Game1()
         {
@@ -123,6 +124,14 @@ namespace MonoGameView
                 _grid2.ClearHighlights();
                 _grid1.DisplayValidation(mouseState.Position, _draggedCluster);
                 _grid2.DisplayValidation(mouseState.Position, _draggedCluster);
+                
+                if (_rightMousePressed && mouseState.RightButton == ButtonState.Released)
+                {
+                    Console.WriteLine("Rotate!");
+                    _draggedCluster.Rotate();
+                }
+
+                _rightMousePressed = mouseState.RightButton == ButtonState.Pressed;
             }
             
             if (_draggedCluster == null && mouseState.LeftButton == ButtonState.Pressed)
