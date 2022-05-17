@@ -106,8 +106,7 @@ public class GolemGrid
             return candidatePairs;
         }
 
-        var partUnderMouse = cluster.GetDraggableUnderMouse(mousePosition);
-        var shapeCoords = cluster.GetCoordsForPart(partUnderMouse);
+        var shapeCoords = cluster.MousePositionToPartCoords(mousePosition);
         
         for (var x = 0; x < _sockets.Length; x++)
         {

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GolemCore.Models;
+using GolemCore.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -85,7 +87,6 @@ public class DraggablePartCluster
         
         return null;
     }
-    
 
     public void Grab(MouseState mouseState)
     {
@@ -106,20 +107,13 @@ public class DraggablePartCluster
         return _draggableParts.SelectMany(line => line.Where(p => p != null)).Any(part => part == partToCheck);
     }
 
-    public Vector2 GetCoordsForPart(DraggablePart part)
+    public Vector2 MousePositionToPartCoords(Point mouseCoords)
     {
-        for (var x = 0; x < _draggableParts.Length; x++)
-        {
-            for (var y = 0; y < _draggableParts[x].Length; y++)
-            {
-                if (_draggableParts[x][y] == part)
-                {
-                    return new Vector2(x, y);
-                }
-            }
-        }
-
-        throw new KeyNotFoundException($"Could not find part {part.Part.Name} in DraggablePartCluster");
+        var relativeX = mouseCoords.X - _position.X;
+        var relativeY = mouseCoords.Y - _position.Y;
+        var indexX = (float) Math.Floor(relativeX / Constants.PartSize);
+        var indexY = (float) Math.Floor(relativeY / Constants.PartSize);
+        return new Vector2(indexX, indexY);
     }
 
     public DraggablePart GetDraggableAtCoords(int x, int y)

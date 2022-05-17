@@ -30,5 +30,10 @@ namespace MonoGameView
             spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color.White);
             spriteBatch.DrawString(_font, Part.Name.Replace(' ', '\n'), Position, Color.White);
         }
+
+        public override string ToString()
+        {
+            return Part.Id.ToString();
+        }
     }
 }

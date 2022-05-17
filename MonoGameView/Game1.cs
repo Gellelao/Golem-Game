@@ -127,7 +127,6 @@ namespace MonoGameView
                 
                 if (_rightMousePressed && mouseState.RightButton == ButtonState.Released)
                 {
-                    Console.WriteLine("Rotate!");
                     _draggedCluster.Rotate();
                 }
 
