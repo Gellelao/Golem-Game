@@ -5,7 +5,7 @@ namespace MonoGameView
 {
     public abstract class Region
     {
-        public Vector2 Position { get; protected set; }
+        public Vector2 Position { get; set; }
         public int Height { get; }
         public int Width { get; }
         public Texture2D Texture { get; }

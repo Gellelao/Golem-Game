@@ -5,12 +5,15 @@ namespace MonoGameView
 {
     public class PartSocket : Region
     {
+        private readonly Texture2D _highlightTexture;
         public Vector2 GolemPartIndex { get; }
         public DraggablePart StoredPart { get; private set; }
+        public bool Highlight { get; set; }
 
-        public PartSocket(Vector2 golemPartIndex, int height, int width, Texture2D texture) : base(ConvertIndexToPosition(golemPartIndex), height, width, texture)
+        public PartSocket(Vector2 golemPartIndex, int height, int width, Texture2D texture, Texture2D highlightTexture) : base(ConvertIndexToPosition(golemPartIndex), height, width, texture)
         {
             GolemPartIndex = golemPartIndex;
+            _highlightTexture = highlightTexture;
         }
 
         private static Vector2 ConvertIndexToPosition(Vector2 golemPartIndex)
@@ -39,6 +42,13 @@ namespace MonoGameView
         public void ClearStorage()
         {
             StoredPart = null;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            var texture = Highlight ? _highlightTexture : Texture;
+            spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color.White);
+            spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X+2, (int)Position.Y+2, Width-4, Height-4), Color.MintCream);
         }
     }
 }

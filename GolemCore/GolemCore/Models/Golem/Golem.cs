@@ -10,12 +10,12 @@ public class Golem
 
     public int UserId { get; init; }
     public int Version { get; init; } = 1;
-    public int[][] PartIds { get; init; } =
+    public string[][] PartIds { get; init; } =
     {
-        new []{-1,-1,-1,-1},
-        new []{-1,-1,-1,-1},
-        new []{-1,-1,-1,-1},
-        new []{-1,-1,-1,-1}
+        new []{"-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1"}
     };
 
     public override string ToString()
