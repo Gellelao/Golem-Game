@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Linq;
-using GolemCore;
+using GolemCore.Models;
 using GolemCore.Models.Golem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -41,17 +39,24 @@ public class GolemGrid
         }
     }
 
-    private void UpdateGolem()
+    private void AddClusterToGolem(DraggablePartCluster cluster)
     {
+        var highestExistingCount = _golem.GetHighestExistingCount(cluster.GetIdOfPartsInCluster());
+        var suffix = highestExistingCount == 0 ? "" : $".{highestExistingCount}";
+
         foreach (var line in _sockets)
         {
             foreach (var socket in line)
             {
-                // TODO: Why do X and Y need to be flipped
-                _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
+                _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id + suffix;
             }
         }
         Console.WriteLine(_golem);
+    }
+
+    private bool GolemContainsAnyPartsWithId(int getIdOfPartsInCluster)
+    {
+        throw new NotImplementedException();
     }
 
     public void UnsocketPartsOfCluster(DraggablePartCluster cluster)
@@ -74,12 +79,12 @@ public class GolemGrid
 
         if (candidatePairs.Count > 0 && candidatePairs.All(kvp => kvp.Value != null))
         {
-            foreach (var kvp in candidatePairs)
+            foreach (var (part, socket) in candidatePairs)
             {
-                kvp.Value.StorePart(kvp.Key);
+                socket.StorePart(part);
             }
             cluster.SetPosition(clusterPosition);
-            UpdateGolem();
+            AddClusterToGolem(cluster);
         }
     }
 

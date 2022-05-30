@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GolemCore.Models;
-using GolemCore.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -18,7 +16,8 @@ public class DraggablePartCluster
     private Vector2 _position;
     private readonly Texture2D _redTexture;
 
-    public DraggablePartCluster(Vector2 position, Texture2D grayTexture, SpriteFont arialFont, Texture2D redTexture, Part part)
+    public DraggablePartCluster(Vector2 position, Texture2D grayTexture, SpriteFont arialFont, Texture2D redTexture,
+        Part part)
     {
         _position = position;
         _draggableParts = new DraggablePart[part.Shape.Length][];
@@ -73,6 +72,11 @@ public class DraggablePartCluster
                 }
             }
         }
+    }
+
+    public int GetIdOfPartsInCluster()
+    {
+        return _draggableParts.SelectMany(line => line.Where(p => p != null)).First().Part.Id;
     }
 
     public DraggablePart GetDraggableUnderMouse(Point mousePosition)
