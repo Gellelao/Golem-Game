@@ -24,15 +24,18 @@ public class Golem
             Select(id => id.Split('.')).
             Where(tuple => tuple[0] == partId.ToString()).
             ToList();
-        if (existingPartsWithSameId.Any())
+        if (!existingPartsWithSameId.Any())
         {
+            Console.WriteLine($"No parts with id {partId}, returning 0");
             return 0;
         }
 
-        var partsWithSuffixes = existingPartsWithSameId.Where(tuple => tuple.Length > 1);
-        return partsWithSuffixes.Any()
+        var partsWithSuffixes = existingPartsWithSameId.Where(tuple => tuple.Length > 1).ToList();
+        var result = partsWithSuffixes.Any()
             ? partsWithSuffixes.Select(tuple => int.Parse(tuple[1])).OrderByDescending(x => x).First() + 1
             : 1;
+        Console.WriteLine(result);
+        return result;
     }
 
     public override string ToString()

@@ -48,15 +48,27 @@ public class GolemGrid
         {
             foreach (var socket in line)
             {
-                _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id + suffix;
+                if (cluster.Contains(socket.StoredPart))
+                {
+                    _golem.PartIds[(int)socket.GolemPartIndex.Y][(int)socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id + suffix;
+                }
             }
         }
         Console.WriteLine(_golem);
     }
 
-    private bool GolemContainsAnyPartsWithId(int getIdOfPartsInCluster)
+    private void RemoveClusterFromGolem(DraggablePartCluster cluster)
     {
-        throw new NotImplementedException();
+        foreach (var line in _sockets)
+        {
+            foreach (var socket in line)
+            {
+                if (cluster.Contains(socket.StoredPart))
+                {
+                    // impossible to correspond the part stored in this socket with an index in the golem array
+                }
+            }
+        }
     }
 
     public void UnsocketPartsOfCluster(DraggablePartCluster cluster)
@@ -79,6 +91,7 @@ public class GolemGrid
 
         if (candidatePairs.Count > 0 && candidatePairs.All(kvp => kvp.Value != null))
         {
+            RemoveClusterFromGolem(cluster);
             foreach (var (part, socket) in candidatePairs)
             {
                 socket.StorePart(part);
