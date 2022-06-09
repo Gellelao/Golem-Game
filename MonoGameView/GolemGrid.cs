@@ -41,10 +41,18 @@ public class GolemGrid
 
     private void UpdateGolem(DraggablePartCluster cluster)
     {
+        // there should be a way to do this, not sure if a dictionary is gonna do it tho
+        var seenClusters = new List<DraggablePartCluster>();
+        var map = new Dictionary<DraggablePartCluster, int>();
         foreach (var line in _sockets)
         {
             foreach (var socket in line)
             {
+                if (socket.StoredPart != null)
+                {
+                    var parentCluster = socket.StoredPart.Parent;
+                    map.AddOrIncrement(parentCluster);
+                }
                 _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
             }
         }

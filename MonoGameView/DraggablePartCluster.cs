@@ -30,7 +30,7 @@ public class DraggablePartCluster
                 if (part.Shape[x][y])
                 {
                     _draggableParts[x][y] = new DraggablePart(new Vector2(position.X + x * Constants.PartSize, position.Y + y * Constants.PartSize),
-                        Constants.PartSize, grayTexture, arialFont, redTexture)
+                        Constants.PartSize, grayTexture, arialFont, redTexture, this)
                     {
                         Part = part
                     };

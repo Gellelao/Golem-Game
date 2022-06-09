@@ -9,12 +9,13 @@ namespace MonoGameView
         private readonly SpriteFont _font;
         private readonly Texture2D _invalidTexture;
         public bool Invalid { get; set; }
-
         public Part Part { get; init; }
+        public DraggablePartCluster Parent { get; }
 
         public DraggablePart(Vector2 position, int size, Texture2D texture, SpriteFont font,
-            Texture2D invalidTexture) : base(position, size, size, texture)
+            Texture2D invalidTexture, DraggablePartCluster parent) : base(position, size, size, texture)
         {
+            Parent = parent;
             _font = font;
             _invalidTexture = invalidTexture;
         }
