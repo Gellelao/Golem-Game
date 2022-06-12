@@ -1,5 +1,4 @@
-﻿using GolemCore.Models;
-using GolemCore.Models.Enums;
+﻿using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 
 namespace GolemCore;
@@ -8,6 +7,7 @@ public class Resolver
 {
   public static List<string> GetOutcome(Golem user, Golem opponent, PartsCache partsCache)
   {
+    var turnCounter = 0;
     var results = new List<string>();
     var userParser = new GolemParser(user, partsCache);
     var opponentParser = new GolemParser(opponent, partsCache);
@@ -24,6 +24,12 @@ public class Resolver
       results.Add($"You do {userAttack} damage to opponent, who is now at {opponentHealth} HP");
       userHealth -= opponentAttack;
       results.Add($"They do {opponentAttack} damage to you, leaving you at {userHealth} HP");
+      turnCounter++;
+      if (turnCounter >= Constants.TurnLimit)
+      {
+        results.Add($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
+        break;
+      }
     }
 
     return results;

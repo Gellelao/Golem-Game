@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GolemCore.Models;
 using GolemCore.Models.Golem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -39,7 +38,7 @@ public class GolemGrid
         }
     }
 
-    private void UpdateGolem(DraggablePartCluster cluster)
+    private void UpdateGolem()
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
         foreach (var line in _sockets)
@@ -64,7 +63,7 @@ public class GolemGrid
                     {
                         partIdToCluster.Add(partId, new List<DraggablePartCluster>{ parentCluster});
                     }
-                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart.Part.Id.ToString() + (suffix > 0 ? $".{suffix}" : "");
+                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
                 }
                 else
                 {
@@ -87,6 +86,7 @@ public class GolemGrid
                 }
             }
         }
+        UpdateGolem();
     }
 
     public void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
@@ -100,7 +100,7 @@ public class GolemGrid
                 socket.StorePart(part);
             }
             cluster.SetPosition(clusterPosition);
-            UpdateGolem(cluster);
+            UpdateGolem();
         }
     }
 
