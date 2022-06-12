@@ -41,19 +41,35 @@ public class GolemGrid
 
     private void UpdateGolem(DraggablePartCluster cluster)
     {
-        // there should be a way to do this, not sure if a dictionary is gonna do it tho
-        var seenClusters = new List<DraggablePartCluster>();
-        var map = new Dictionary<DraggablePartCluster, int>();
+        var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
         foreach (var line in _sockets)
         {
             foreach (var socket in line)
             {
                 if (socket.StoredPart != null)
                 {
+                    var partId = socket.StoredPart.Part.Id;
                     var parentCluster = socket.StoredPart.Parent;
-                    map.AddOrIncrement(parentCluster);
+                    var suffix = 0;
+                    if (partIdToCluster.ContainsKey(partId))
+                    {
+                        if (!partIdToCluster[partId].Contains(parentCluster))
+                        {
+                            partIdToCluster[partId].Add(parentCluster);
+                        }
+
+                        suffix = partIdToCluster[partId].IndexOf(parentCluster);
+                    }
+                    else
+                    {
+                        partIdToCluster.Add(partId, new List<DraggablePartCluster>{ parentCluster});
+                    }
+                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart.Part.Id.ToString() + (suffix > 0 ? $".{suffix}" : "");
                 }
-                _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart == null ? "-1" : socket.StoredPart.Part.Id.ToString();
+                else
+                {
+                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                }
             }
         }
         Console.WriteLine(_golem);
