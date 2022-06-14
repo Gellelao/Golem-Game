@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GolemCore.Models;
+using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

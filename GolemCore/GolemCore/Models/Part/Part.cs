@@ -1,13 +1,12 @@
 ﻿using GolemCore.Models.Enums;
 
-namespace GolemCore.Models;
+namespace GolemCore.Models.Part;
 
 public class Part
 {
   public int Id { get; init; }
   public string Name { get; init; }
   public Tier Tier { get; init; }
-  public PartMaterial Material { get; init; }
   public PartTag[] Tags { get; init; }
   public List<Stat> Stats { get; set; }
   public bool[][] Shape { get; init; } =

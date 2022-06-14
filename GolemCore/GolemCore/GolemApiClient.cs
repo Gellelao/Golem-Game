@@ -2,6 +2,7 @@
 using System.Text.Json;
 using GolemCore.Models;
 using GolemCore.Models.Golem;
+using GolemCore.Models.Part;
 
 namespace GolemCore;
 
@@ -31,7 +32,7 @@ public class GolemApiClient : IGolemApiClient
 
     public async Task CreateGolem(CreateGolemRequest golem, CancellationToken cancellationToken)
     {
-        var result = await _httpClient.PostAsJsonAsync(Constants.PostGolemEndpoint, golem, Options, cancellationToken);
+        var result = await _httpClient.PostAsJsonAsync(Constants.PostEndpoint, golem, Options, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
@@ -41,7 +42,7 @@ public class GolemApiClient : IGolemApiClient
 
     public async Task UpdateGolem(UpdateRequest update, CancellationToken cancellationToken)
     {
-        var result = await _httpClient.PutAsJsonAsync(Constants.PostGolemEndpoint, update, Options, cancellationToken);
+        var result = await _httpClient.PutAsJsonAsync(Constants.PostEndpoint, update, Options, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
@@ -59,5 +60,15 @@ public class GolemApiClient : IGolemApiClient
         }
 
         return parts.Items;
+    }
+
+    public async Task PostPart(CreatePartRequest part, CancellationToken cancellationToken)
+    {
+        var result = await _httpClient.PostAsJsonAsync(Constants.PostEndpoint, part, Options, cancellationToken);
+
+        if (!result.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("Failed to post part");
+        }
     }
 }

@@ -1,80 +1,91 @@
-﻿using static Utils.PartsManager;
-using System.Text.Json;
-using GolemCore;
-using GolemCore.Models;
-using GolemCore.Models.Golem;
+﻿using GolemCore.Models;
+using GolemCore.Models.Enums;
+using GolemCore.Models.Part;
+using static Utils.PartsManager;
 
 Console.WriteLine("Hello, World!");
 
 await WritePartsFromDatabaseIntoFile("test.json");
 
-
-
-Console.WriteLine("Hello, World!");
-
-var client = GolemApiClientFactory.Create();
-
-var cancellationToken = new CancellationToken();
-
-var golem1 = new Golem
+var newParts = new List<Part>
 {
-    UserId = 1,
-    PartIds = new []
+    new()
     {
-        new []{"1", "1", "1"},
-        new []{"0", "0", "0"},
-        new []{"1", "0", "1"},
-    }
-};
-
-var golem2 = new Golem
-{
-    UserId = 2,
-    PartIds = new []
-    {
-        new []{"0", "1", "0"},
-        new []{"0", "0", "0"},
-        new []{"0", "0", "0"},
-    }
-};
-
-var parts = await client.GetParts(cancellationToken);
-
-var partsCache = new PartsCache(parts);
-
-var results = Resolver.GetOutcome(golem1, golem2, partsCache);
-
-foreach (var result in results)
-{
-    Console.WriteLine(result);
-}
-
-var shop = new Shop(partsCache);
-
-await client.CreateGolem(new CreateGolemRequest{Item = golem1}, cancellationToken);
-
-var golems = await client.GetGolemSelection(new CancellationToken());
-
-Console.WriteLine(golems[0].UserId);
-
-var golemToUpdate = golems.First(g => g.Version == 1);
-
-var updateRequest = new UpdateRequest
-{
-    TableName = "golem",
-    Key = new
-    {
-        Timestamp = golemToUpdate.Timestamp,
-        UserId = golemToUpdate.UserId
+        Id = 0,
+        Name = "Hand",
+        Tier = Tier.Common,
+        Tags = new[] {PartTag.Grabby},
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Attack
+            },
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Health
+            }
+        },
+        Shape = new[]
+        {
+            new[] {true, true, false, false},
+            new[] {true, true, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        }
     },
-    UpdateExpression = "set Version = :newVersion",
-    ConditionExpression = "Version = :version",
-    ExpressionAttributeValues = new Dictionary<string, object>
+    new()
     {
-        { ":newVersion", 0 },
-        { ":version", 1 }
+        Id = 1,
+        Name = "Orb",
+        Tier = Tier.Common,
+        Tags = new[] {PartTag.Orb},
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Attack
+            },
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Health
+            }
+        },
+        Shape = new[]
+        {
+            new[] {true, false, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        }
     }
 };
 
-var json = JsonSerializer.Serialize(updateRequest, new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null}));
-await client.UpdateGolem(updateRequest, cancellationToken);
+await PostAllParts(newParts);
+
+
+// Updating without just PUTting a new itme with the same id:
+
+// var updateRequest = new UpdateRequest
+// {
+//     TableName = "golem",
+//     Key = new
+//     {
+//         Timestamp = golemToUpdate.Timestamp,
+//         UserId = golemToUpdate.UserId
+//     },
+//     UpdateExpression = "set Version = :newVersion",
+//     ConditionExpression = "Version = :version",
+//     ExpressionAttributeValues = new Dictionary<string, object>
+//     {
+//         { ":newVersion", 0 },
+//         { ":version", 1 }
+//     }
+// };
+//
+// var json = JsonSerializer.Serialize(updateRequest, new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null}));
+// await client.UpdateGolem(updateRequest, cancellationToken);

@@ -2,6 +2,7 @@
 using GolemCore;
 using GolemCore.Models;
 using GolemCore.Models.Golem;
+using GolemCore.Models.Part;
 
 namespace Utils;
 
@@ -15,6 +16,18 @@ public static class PartsManager
     await using var fileStream = File.Create(fileName);
     await JsonSerializer.SerializeAsync(fileStream, parts, client.Options);
     await fileStream.DisposeAsync();
+  }
+
+  public static async Task PostAllParts(List<Part> parts)
+  {
+    var client = (GolemApiClient)GolemApiClientFactory.Create();
+    foreach (var part in parts)
+    {
+      await client.PostPart(new CreatePartRequest
+      {
+        Item = part
+      }, new CancellationToken());
+    }
   }
 
   public static async Task UploadPartsFromFileIntoDatabase(string fileName)

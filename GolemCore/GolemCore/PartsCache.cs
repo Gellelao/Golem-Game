@@ -1,4 +1,5 @@
 ﻿using GolemCore.Models;
+using GolemCore.Models.Part;
 
 namespace GolemCore;
 
