@@ -75,11 +75,6 @@ public class DraggablePartCluster
         }
     }
 
-    public int GetIdOfPartsInCluster()
-    {
-        return _draggableParts.SelectMany(line => line.Where(p => p != null)).First().Part.Id;
-    }
-
     public DraggablePart GetDraggableUnderMouse(Point mousePosition)
     {
         foreach (var line in _draggableParts)
@@ -131,13 +126,13 @@ public class DraggablePartCluster
         _position = position;
     }
 
-    public void ClearInvalidDisplay()
+    public void SetInvalidOnAllParts(bool invalid)
     {
         foreach (var line in _draggableParts)
         {
             foreach (var part in line.Where(p => p != null))
             {
-                part.Invalid = false;
+                part.Invalid = invalid;
             }
         }
     }

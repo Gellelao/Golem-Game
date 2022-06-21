@@ -1,9 +1,10 @@
-﻿using GolemCore.Models.Enums;
+﻿using GolemCore.Extensions;
+using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 
 namespace GolemCore;
 
-public class Resolver
+public class CombatResolver
 {
   public static List<string> GetOutcome(Golem user, Golem opponent, PartsCache partsCache)
   {
@@ -54,18 +55,9 @@ public class Resolver
       {
         foreach (var id in idList.Where(id => id != "-1"))
         {
-          int idForLookup;
           if (seenParts.Contains(id)) continue;
-          if (id.Contains('.'))
-          {
-            seenParts.Add(id);
-            idForLookup = int.Parse(id.Split('.')[0]);
-          }
-          else
-          {
-            idForLookup = int.Parse(id);
-          }
-          var part = _cache.Get(idForLookup);
+          seenParts.Add(id);
+          var part = _cache.Get(id.ToPartId());
           sum += part.Stats.Where(stat => stat.Type == typeToSum).Sum(stat => stat.Modifier);
         }
       }

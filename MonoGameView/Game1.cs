@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using GolemCore;
 using GolemCore.Models.Golem;
+using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -23,6 +24,7 @@ namespace MonoGameView
         private Button _combatButton;
         private SpriteFont _arialFont;
         private bool _rightMousePressed;
+        private PartValidator _validator;
 
         public Game1()
         {
@@ -49,10 +51,6 @@ namespace MonoGameView
             
             var golem1 = new Golem{UserId = 1};
             var golem2 = new Golem{UserId = 2};
-
-            _grid1 = new GolemGrid(golem1, blankTexture, yellowTexture);
-            Constants.SocketDistanceFromLeft = 500;
-            _grid2 = new GolemGrid(golem2, blankTexture, yellowTexture);
             
             var buttonTexture = new Texture2D(GraphicsDevice, 1, 1);
             buttonTexture.SetData(new[] { Color.ForestGreen });
@@ -68,8 +66,14 @@ namespace MonoGameView
             _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
             
             _shop = new Shop(partsCache);
-
             var partSelection = _shop.GetPartsForRound(2);
+
+            _validator = new PartValidator(partsCache);
+            
+            _grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
+            Constants.SocketDistanceFromLeft = 500;
+            _grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
+
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -106,8 +110,8 @@ namespace MonoGameView
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _grid1.Draw(_spriteBatch);
-            _grid2.Draw(_spriteBatch);
+            _grid1?.Draw(_spriteBatch);
+            _grid2?.Draw(_spriteBatch);
             _combatButton.Draw(_spriteBatch);
             foreach (var cluster in _clusters.Reverse())
             {
@@ -163,8 +167,8 @@ namespace MonoGameView
 
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
-                
-                _draggedCluster.ClearInvalidDisplay();
+
+                _draggedCluster.SetInvalidOnAllParts(false);
                 _draggedCluster = null;
             }
         }
@@ -194,7 +198,7 @@ namespace MonoGameView
 
         private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
         {
-            var results = Resolver.GetOutcome(golem1, golem2, cache);
+            var results = CombatResolver.GetOutcome(golem1, golem2, cache);
 
             foreach (var result in results)
             {

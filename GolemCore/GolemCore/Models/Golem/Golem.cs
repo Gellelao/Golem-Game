@@ -18,6 +18,11 @@ public class Golem
         new []{"-1","-1","-1","-1"}
     };
 
+    public List<string> IdList
+    {
+        get { return PartIds.SelectMany(p => p).ToList(); }
+    }
+
     public override string ToString()
     {
         var builder = new StringBuilder();

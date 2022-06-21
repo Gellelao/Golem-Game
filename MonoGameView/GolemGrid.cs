@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GolemCore.Models.Golem;
+using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,11 +12,13 @@ namespace MonoGameView;
 public class GolemGrid
 {
     private Golem _golem;
+    private readonly PartValidator _validator;
     private PartSocket[][] _sockets;
 
-    public GolemGrid(Golem golem, Texture2D blankTexture, Texture2D highlightTexture)
+    public GolemGrid(Golem golem, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
     {
         _golem = golem;
+        _validator = validator;
         _sockets = new PartSocket[golem.PartIds.Length][];
         for(var x = 0; x < _golem.PartIds.Length; x++)
         {
@@ -41,6 +44,12 @@ public class GolemGrid
     private void UpdateGolem()
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
+        var tempIds = new string[_golem.PartIds.Length][];
+        var valid = true;
+        for (var i = 0; i < _golem.PartIds.Length; i++)
+        {
+            tempIds[i] = new string[_golem.PartIds[i].Length];
+        }
         foreach (var line in _sockets)
         {
             foreach (var socket in line)
@@ -49,6 +58,7 @@ public class GolemGrid
                 {
                     var partId = socket.StoredPart.Part.Id;
                     var parentCluster = socket.StoredPart.Parent;
+                    
                     var suffix = 0;
                     if (partIdToCluster.ContainsKey(partId))
                     {
@@ -61,13 +71,38 @@ public class GolemGrid
                     }
                     else
                     {
-                        partIdToCluster.Add(partId, new List<DraggablePartCluster>{ parentCluster});
+                        partIdToCluster.Add(partId, new List<DraggablePartCluster>{ parentCluster });
                     }
-                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
+
+                    var idWithSuffix = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
+                    tempIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
+
+                    // need to pass in a candidate golem here
+                    var validationProblems = _validator.Validate(idWithSuffix, _golem);
+                    if (validationProblems.Any())
+                    {
+                        valid = false;
+                        foreach (var problem in validationProblems)
+                        {
+                            Console.WriteLine(problem.Reason);
+                        }
+                        parentCluster.SetInvalidOnAllParts(true);
+                    }
                 }
                 else
                 {
-                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                    tempIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                }
+            }
+        }
+
+        if (valid)
+        {
+            for (var i = 0; i < tempIds.Length; i++)
+            {
+                for (var j = 0; j < tempIds[i].Length; j++)
+                {
+                    _golem.PartIds[i][j] = tempIds[i][j];
                 }
             }
         }
