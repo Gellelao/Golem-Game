@@ -44,12 +44,20 @@ public class GolemGrid
     private void UpdateGolem()
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
-        var tempIds = new string[_golem.PartIds.Length][];
         var valid = true;
+
+        var candidateGolem = new Golem
+        {
+            UserId = _golem.UserId,
+            Timestamp = _golem.Timestamp,
+            Version = _golem.Version,
+            PartIds = new string[_golem.PartIds.Length][]
+        };
         for (var i = 0; i < _golem.PartIds.Length; i++)
         {
-            tempIds[i] = new string[_golem.PartIds[i].Length];
+            candidateGolem.PartIds[i] = new string[_golem.PartIds[i].Length];
         }
+        
         foreach (var line in _sockets)
         {
             foreach (var socket in line)
@@ -75,36 +83,37 @@ public class GolemGrid
                     }
 
                     var idWithSuffix = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
-                    tempIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
-
-                    // need to pass in a candidate golem here
-                    var validationProblems = _validator.Validate(idWithSuffix, _golem);
-                    if (validationProblems.Any())
-                    {
-                        valid = false;
-                        foreach (var problem in validationProblems)
-                        {
-                            Console.WriteLine(problem.Reason);
-                        }
-                        parentCluster.SetInvalidOnAllParts(true);
-                    }
+                    candidateGolem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
                 }
                 else
                 {
-                    tempIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                    candidateGolem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                }
+            }
+        }
+
+        // need to pass in a candidate golem here
+        foreach (var line in _sockets)
+        {
+            foreach (var socket in line)
+            {
+                var validationProblems = _validator.Validate(id, candidateGolem);
+                if (validationProblems.Any())
+                {
+                    valid = false;
+                    foreach (var problem in validationProblems)
+                    {
+                        Console.WriteLine(problem.Reason);
+                    }
+
+                    socket.StoredPart.Parent.SetInvalidOnAllParts(true);
                 }
             }
         }
 
         if (valid)
         {
-            for (var i = 0; i < tempIds.Length; i++)
-            {
-                for (var j = 0; j < tempIds[i].Length; j++)
-                {
-                    _golem.PartIds[i][j] = tempIds[i][j];
-                }
-            }
+            _golem = candidateGolem;
         }
         Console.WriteLine(_golem);
     }
