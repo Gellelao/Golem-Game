@@ -185,6 +185,7 @@ namespace MonoGameView
                 _grid2.UnsocketPartsOfCluster(_draggedCluster);
                 
                 MoveClusterToFront(cluster);
+                cluster.SetInvalidOnAllParts(false);
                 cluster.Grab(mouseState);
                 break;
             }

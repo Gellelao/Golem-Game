@@ -1,5 +1,4 @@
-﻿using GolemCore.Models;
-using GolemCore.Models.Part;
+﻿using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

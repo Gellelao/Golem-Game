@@ -227,6 +227,12 @@ public class GolemGrid
     public void DisplayValidation(Point mouseStatePosition, DraggablePartCluster cluster)
     {
         var candidates = GetCandidates(mouseStatePosition, cluster, out _);
+
+        if (!candidates.Any())
+        {
+            cluster.ClearTempInvalids();
+        }
+        
         foreach (var (part, socket) in candidates)
         {
             if (socket == null)
