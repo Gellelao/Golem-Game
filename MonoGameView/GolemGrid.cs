@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GolemCore.Extensions;
 using GolemCore.Models.Golem;
 using GolemCore.Validation;
 using Microsoft.Xna.Framework;
@@ -45,18 +46,6 @@ public class GolemGrid
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
         var valid = true;
-
-        var candidateGolem = new Golem
-        {
-            UserId = _golem.UserId,
-            Timestamp = _golem.Timestamp,
-            Version = _golem.Version,
-            PartIds = new string[_golem.PartIds.Length][]
-        };
-        for (var i = 0; i < _golem.PartIds.Length; i++)
-        {
-            candidateGolem.PartIds[i] = new string[_golem.PartIds[i].Length];
-        }
         
         foreach (var line in _sockets)
         {
@@ -67,6 +56,8 @@ public class GolemGrid
                     var partId = socket.StoredPart.Part.Id;
                     var parentCluster = socket.StoredPart.Parent;
                     
+                    // Get the suffix (e.g 1.2, with 2 being the suffix and 1 being the part id) by adding each
+                    // unique cluster to a list, and getting the index of that cluster in the list
                     var suffix = 0;
                     if (partIdToCluster.ContainsKey(partId))
                     {
@@ -83,21 +74,34 @@ public class GolemGrid
                     }
 
                     var idWithSuffix = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
-                    candidateGolem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
+                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
                 }
                 else
                 {
-                    candidateGolem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
                 }
             }
         }
-
-        // need to pass in a candidate golem here
-        foreach (var line in _sockets)
+        
+        foreach (var line in _golem.PartIds)
         {
-            foreach (var socket in line)
+            foreach (var fullId in line.Where(id => id != "-1"))
             {
-                var validationProblems = _validator.Validate(id, candidateGolem);
+                var idTokens = fullId.Split('.');
+                var partId = fullId.ToPartId();
+                DraggablePartCluster cluster;
+                if (idTokens.Length > 1)
+                {
+                    var suffix = int.Parse(idTokens[1]);
+                    cluster = partIdToCluster[partId][suffix];
+                }
+                else
+                {
+                    cluster = partIdToCluster[partId].First();
+                }
+                
+                var validationProblems = _validator.Validate(fullId, _golem);
+
                 if (validationProblems.Any())
                 {
                     valid = false;
@@ -105,15 +109,18 @@ public class GolemGrid
                     {
                         Console.WriteLine(problem.Reason);
                     }
-
-                    socket.StoredPart.Parent.SetInvalidOnAllParts(true);
+                    cluster.SetInvalidOnAllParts(true);
+                }
+                else
+                {
+                    cluster.SetInvalidOnAllParts(false);
                 }
             }
         }
 
         if (valid)
         {
-            _golem = candidateGolem;
+            // only allow the golem to be uploaded if it is valid. But locally we permit an invalid golem
         }
         Console.WriteLine(_golem);
     }
@@ -224,11 +231,11 @@ public class GolemGrid
         {
             if (socket == null)
             {
-                part.Invalid = true;
+                part.TempInvalid = true;
             }
             else
             {
-                part.Invalid = false;
+                part.TempInvalid = false;
                 socket.Highlight = true;
             }
         }

@@ -137,6 +137,17 @@ public class DraggablePartCluster
         }
     }
 
+    public void ClearTempInvalids()
+    {
+        foreach (var line in _draggableParts)
+        {
+            foreach (var part in line.Where(p => p != null))
+            {
+                part.TempInvalid = false;
+            }
+        }
+    }
+
     public void Rotate()
     {
         var rotated = RotateArray(_draggableParts);

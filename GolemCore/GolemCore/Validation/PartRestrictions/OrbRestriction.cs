@@ -12,7 +12,7 @@ public class OrbRestriction : PartRestriction
     public override List<ValidationProblem> GetProblems(string partIdWithSuffix, Golem golem)
     {
         var problems = new List<ValidationProblem>();
-        if (AnyNeighboursWithTag(partIdWithSuffix, golem, PartTag.Grabby))
+        if (!AnyNeighboursWithTag(partIdWithSuffix, golem, PartTag.Grabby))
         {
             problems.Add(new ValidationProblem("Orb must be adjacent to a Grabby part"));
         }

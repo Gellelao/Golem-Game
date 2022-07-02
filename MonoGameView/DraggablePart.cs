@@ -9,6 +9,7 @@ namespace MonoGameView
     {
         private readonly SpriteFont _font;
         private readonly Texture2D _invalidTexture;
+        public bool TempInvalid { get; set; }
         public bool Invalid { get; set; }
         public Part Part { get; init; }
         public DraggablePartCluster Parent { get; }
@@ -28,7 +29,8 @@ namespace MonoGameView
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            var texture = Invalid ? _invalidTexture : Texture;
+            // Can add another kind of invalid texture in the future then use a switch here
+            var texture = Invalid || TempInvalid ? _invalidTexture : Texture;
             spriteBatch.Draw(texture, Position, new Rectangle((int)Position.X, (int)Position.Y, Width, Height), Color.White);
             spriteBatch.DrawString(_font, Part.Name.Replace(' ', '\n'), Position, Color.White);
         }

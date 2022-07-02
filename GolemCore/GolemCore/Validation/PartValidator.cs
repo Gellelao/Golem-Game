@@ -1,7 +1,6 @@
 ﻿using GolemCore.Extensions;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
-using GolemCore.Models.Part;
 using GolemCore.Validation.PartRestrictions;
 
 namespace GolemCore.Validation;

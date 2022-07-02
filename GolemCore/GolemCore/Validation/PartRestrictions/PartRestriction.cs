@@ -40,7 +40,7 @@ public abstract class PartRestriction
                         if (ids[resultY][resultX] != partIdWithSuffix) continue;
                         
                         var candidateNeighbourId = ids[x][y];
-                        if (candidateNeighbourId != partIdWithSuffix) // don't add other parts from the same cluster
+                        if (candidateNeighbourId != partIdWithSuffix && candidateNeighbourId != "-1") // don't add other parts from the same cluster
                         {
                             neighbours.Add(_partsCache.Get(candidateNeighbourId.ToPartId()));
                         }

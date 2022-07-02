@@ -167,8 +167,8 @@ namespace MonoGameView
 
                 _grid1.ClearHighlights();
                 _grid2.ClearHighlights();
-
-                _draggedCluster.SetInvalidOnAllParts(false);
+                
+                _draggedCluster.ClearTempInvalids();
                 _draggedCluster = null;
             }
         }
