@@ -19,7 +19,7 @@ public abstract class PartRestriction
     protected bool AnyNeighboursWithTag(string partIdWithSuffix, Golem golem, PartTag tag)
     {
         var neighbours = GetNeighboursIncludingDiagonals(partIdWithSuffix, golem);
-        return neighbours.Any(n => n.Tags.Contains(tag));
+        return neighbours.Any(n => n.Tags != null && n.Tags.Contains(tag));
     }
 
     protected List<Part> GetNeighboursIncludingDiagonals(string partIdWithSuffix, Golem golem)
