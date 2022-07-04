@@ -8,4 +8,6 @@ public static class Constants
     public const string GetPartEndpoint = "?TableName=part";
 
     public const int TurnLimit = 20;
+    public const int StartingFunds = 3;
+    public const int StartingShopParts = 4;
 }
