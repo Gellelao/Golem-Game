@@ -37,6 +37,10 @@ namespace MonoGameView
         protected override void Initialize()
         {
             _client = GolemApiClientFactory.Create();
+            
+            _graphics.PreferredBackBufferWidth = 1000;
+            _graphics.PreferredBackBufferHeight = 600;
+            _graphics.ApplyChanges();
             base.Initialize();
         }
 
@@ -63,13 +67,14 @@ namespace MonoGameView
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
 
-            _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
+            _combatButton = new Button(new Vector2(450, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
             
             _shop = new Shop(partsCache);
-            var partSelection = _shop.GetPartsForRound(2);
+            var partSelection = _shop.GetPartsForRound();
 
             _validator = new PartValidator(partsCache);
             
+            Constants.SocketDistanceFromLeft = 200;
             _grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 500;
             _grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
@@ -83,9 +88,6 @@ namespace MonoGameView
             
             for (var i = 0; i < partSelection.Count; i++)
             {
-                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
-                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
-                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
                 _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
             }
         }
