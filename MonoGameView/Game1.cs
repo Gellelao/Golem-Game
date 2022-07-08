@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using GolemCore;
 using GolemCore.Models.Golem;
@@ -15,28 +14,28 @@ namespace MonoGameView
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private readonly LinkedList<DraggablePartCluster> _clusters;
-        private DraggablePartCluster _draggedCluster;
         private Shop _shop;
         private IGolemApiClient _client;
         private GolemGrid _grid1;
         private GolemGrid _grid2;
+        private List<GolemGrid> _grids;
         private Button _combatButton;
         private SpriteFont _arialFont;
-        private bool _rightMousePressed;
         private PartValidator _validator;
+        private ClusterManager _clusterManager;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            _clusters = new LinkedList<DraggablePartCluster>();
         }
 
         protected override void Initialize()
         {
             _client = GolemApiClientFactory.Create();
+            _clusterManager = new ClusterManager();
+            _grids = new List<GolemGrid>();
             
             _graphics.PreferredBackBufferWidth = 1000;
             _graphics.PreferredBackBufferHeight = 600;
@@ -79,6 +78,13 @@ namespace MonoGameView
             Constants.SocketDistanceFromLeft = 500;
             _grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
 
+            _grids.Add(_grid1);
+            _grids.Add(_grid2);
+            
+            foreach (var grid in _grids)
+            {
+                grid?.SubscribeToClusterEvents(_clusterManager);
+            }
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -88,7 +94,7 @@ namespace MonoGameView
             
             for (var i = 0; i < partSelection.Count; i++)
             {
-                _clusters.AddFirst(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
+                _clusterManager.AddCluster(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
             }
         }
 
@@ -101,7 +107,7 @@ namespace MonoGameView
                 kstate.IsKeyDown(Keys.Escape))
                 Exit();
 
-            HandleDragging(mouseState);
+            _clusterManager.Update(mouseState);
             _combatButton.Update(mouseState);
 
             base.Update(gameTime);
@@ -112,91 +118,16 @@ namespace MonoGameView
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _grid1?.Draw(_spriteBatch);
-            _grid2?.Draw(_spriteBatch);
-            _combatButton.Draw(_spriteBatch);
-            foreach (var cluster in _clusters.Reverse())
+            foreach (var grid in _grids)
             {
-                cluster.Draw(_spriteBatch);
+                grid?.Draw(_spriteBatch);
             }
+            _combatButton.Draw(_spriteBatch);
+            _clusterManager.DrawClusters(_spriteBatch);
             
             _spriteBatch.End();
 
             base.Draw(gameTime);
-        }
-
-        private void HandleDragging(MouseState mouseState)
-        {
-            if (_draggedCluster != null)
-            {
-                _grid1.ClearHighlights();
-                _grid2.ClearHighlights();
-                _grid1.DisplayValidation(mouseState.Position, _draggedCluster);
-                _grid2.DisplayValidation(mouseState.Position, _draggedCluster);
-                
-                if (_rightMousePressed && mouseState.RightButton == ButtonState.Released)
-                {
-                    _draggedCluster.Rotate();
-                }
-
-                _rightMousePressed = mouseState.RightButton == ButtonState.Pressed;
-            }
-            
-            if (_draggedCluster == null && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                AttemptNewDrag(mouseState);
-            }
-            
-            if (mouseState.LeftButton == ButtonState.Released)
-            {
-                ReleaseDraggedPart(mouseState);
-            }
-            
-            foreach (var cluster in _clusters)
-            {
-                cluster.Update(mouseState);
-            }
-        }
-
-        private void ReleaseDraggedPart(MouseState mouseState)
-        {
-            if (_draggedCluster != null)
-            {
-                _draggedCluster.Release();
-                
-                _grid1.SocketClusterAtMouse(mouseState, _draggedCluster);
-                _grid2.SocketClusterAtMouse(mouseState, _draggedCluster);
-
-                _grid1.ClearHighlights();
-                _grid2.ClearHighlights();
-                
-                _draggedCluster.ClearTempInvalids();
-                _draggedCluster = null;
-            }
-        }
-
-        private void AttemptNewDrag(MouseState mouseState)
-        {
-            foreach (var cluster in _clusters)
-            {
-                if (cluster.GetDraggableUnderMouse(mouseState.Position) == null) continue;
-                
-                _draggedCluster = cluster;
-                
-                _grid1.UnsocketPartsOfCluster(_draggedCluster);
-                _grid2.UnsocketPartsOfCluster(_draggedCluster);
-                
-                MoveClusterToFront(cluster);
-                cluster.SetInvalidOnAllParts(false);
-                cluster.Grab(mouseState);
-                break;
-            }
-        }
-
-        private void MoveClusterToFront(DraggablePartCluster cluster)
-        {
-            _clusters.Remove(cluster);
-            _clusters.AddFirst(cluster);
         }
 
         private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)

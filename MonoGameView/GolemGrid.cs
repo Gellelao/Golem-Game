@@ -7,6 +7,7 @@ using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameView.Events;
 
 namespace MonoGameView;
 
@@ -16,11 +17,23 @@ public class GolemGrid
     private readonly PartValidator _validator;
     private PartSocket[][] _sockets;
 
+    private EventHandler<ClusterDraggedArgs> _onStartDrag;
+    private EventHandler<ClusterDraggedArgs> _onEndDrag;
+
     public GolemGrid(Golem golem, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
     {
         _golem = golem;
         _validator = validator;
         _sockets = new PartSocket[golem.PartIds.Length][];
+        _onStartDrag = (sender, eventArgs) =>
+        {
+            UnsocketPartsOfCluster(eventArgs.Cluster);
+        };
+        _onEndDrag = (sender, eventArgs) =>
+        {
+            SocketClusterAtMouse(eventArgs.MouseState, eventArgs.Cluster);
+            ClearHighlights();
+        };
         for(var x = 0; x < _golem.PartIds.Length; x++)
         {
             for(var y = 0; y < _golem.PartIds[x].Length; y++)
@@ -28,6 +41,15 @@ public class GolemGrid
                 _sockets[y] ??= new PartSocket[golem.PartIds[y].Length];
                 _sockets[x][y] = new PartSocket(new Vector2(x, y), Constants.SocketSize, Constants.SocketSize, blankTexture, highlightTexture);
             }
+        }
+    }
+
+    public void Update(DraggablePartCluster draggedCluster, MouseState mouseState)
+    {
+        if (draggedCluster != null)
+        {
+            ClearHighlights();
+            DisplayValidation(mouseState.Position, draggedCluster);
         }
     }
 
@@ -125,7 +147,7 @@ public class GolemGrid
         Console.WriteLine(_golem);
     }
 
-    public void UnsocketPartsOfCluster(DraggablePartCluster cluster)
+    private void UnsocketPartsOfCluster(DraggablePartCluster cluster)
     {
         foreach (var line in _sockets)
         {
@@ -245,5 +267,11 @@ public class GolemGrid
                 socket.Highlight = true;
             }
         }
+    }
+
+    public void SubscribeToClusterEvents(ClusterManager clusterManager)
+    {
+        clusterManager.StartDrag += _onStartDrag;
+        clusterManager.EndDrag += _onEndDrag;
     }
 }
