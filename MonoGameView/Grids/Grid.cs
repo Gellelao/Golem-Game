@@ -19,7 +19,7 @@ public abstract class Grid
 
     private DraggablePartCluster _currentCluster;
 
-    public Grid(int width, int height, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
+    protected Grid(int width, int height, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
     {
         Validator = validator;
         Sockets = new PartSocket[width][];
@@ -170,9 +170,9 @@ public abstract class Grid
                 var offsetX = x + (int) socketUnderMouseCoords.Value.X - (int) shapeCoords.X;
                 var offsetY = y + (int) socketUnderMouseCoords.Value.Y - (int) shapeCoords.Y;
 
-                // If there is a draggablePart at these indices, and it's either out of bounds or the socked it occupied
+                // If there is a draggablePart at these indices, and it's either out of bounds or the socket is occupied
                 // then mark that part as invalid using a null value in the dictionary
-                if (offsetX < 0 || offsetX >= Sockets[x].Length || offsetY < 0 || offsetY >= Sockets.Length ||
+                if (offsetX < 0 || offsetX >= Sockets.Length || offsetY < 0 || offsetY >= Sockets[x].Length ||
                     (draggableToCheck != null && Sockets[offsetX][offsetY].StoredPart != null))
                 {
                     if (draggableToCheck != null)
