@@ -15,7 +15,7 @@ namespace MonoGameView
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Shop _shop;
+        private ShopView _shopView;
         private IGolemApiClient _client;
         private GolemGrid _grid1;
         private GolemGrid _grid2;
@@ -69,8 +69,9 @@ namespace MonoGameView
 
             _combatButton = new Button(new Vector2(450, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
             
-            _shop = new Shop(partsCache);
-            var partSelection = _shop.GetPartsForRound();
+            var shop = new Shop(partsCache);
+
+            _shopView = new ShopView(shop, yellowTexture, buttonTexture, _arialFont);
 
             _validator = new PartValidator(partsCache);
             
@@ -95,10 +96,10 @@ namespace MonoGameView
             var redTexture = new Texture2D(GraphicsDevice, 1, 1);
             redTexture.SetData(new[] { Color.IndianRed });
             
-            for (var i = 0; i < partSelection.Count; i++)
-            {
-                _clusterManager.AddCluster(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
-            }
+            // for (var i = 0; i < partSelection.Count; i++)
+            // {
+            //     _clusterManager.AddCluster(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
+            // }
         }
 
         protected override void Update(GameTime gameTime)
@@ -112,6 +113,7 @@ namespace MonoGameView
 
             _clusterManager.Update(mouseState);
             _combatButton.Update(mouseState);
+            _shopView?.Update(mouseState);
 
             foreach (var grid in _grids)
             {
@@ -131,6 +133,7 @@ namespace MonoGameView
                 grid?.Draw(_spriteBatch);
             }
             _combatButton.Draw(_spriteBatch);
+            _shopView?.Draw(_spriteBatch);
             _clusterManager.DrawClusters(_spriteBatch);
             
             _spriteBatch.End();
