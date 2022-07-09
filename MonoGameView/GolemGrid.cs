@@ -17,6 +17,7 @@ public class GolemGrid
     private readonly PartValidator _validator;
     private PartSocket[][] _sockets;
 
+    private DraggablePartCluster _currentCluster;
     private EventHandler<ClusterDraggedArgs> _onStartDrag;
     private EventHandler<ClusterDraggedArgs> _onEndDrag;
 
@@ -27,11 +28,13 @@ public class GolemGrid
         _sockets = new PartSocket[golem.PartIds.Length][];
         _onStartDrag = (sender, eventArgs) =>
         {
-            UnsocketPartsOfCluster(eventArgs.Cluster);
+            _currentCluster = eventArgs.Cluster;
+            UnsocketPartsOfCluster(_currentCluster);
         };
         _onEndDrag = (sender, eventArgs) =>
         {
             SocketClusterAtMouse(eventArgs.MouseState, eventArgs.Cluster);
+            _currentCluster = null;
             ClearHighlights();
         };
         for(var x = 0; x < _golem.PartIds.Length; x++)
@@ -44,12 +47,12 @@ public class GolemGrid
         }
     }
 
-    public void Update(DraggablePartCluster draggedCluster, MouseState mouseState)
+    public void Update(MouseState mouseState)
     {
-        if (draggedCluster != null)
+        if (_currentCluster != null)
         {
             ClearHighlights();
-            DisplayValidation(mouseState.Position, draggedCluster);
+            DisplayValidation(mouseState.Position, _currentCluster);
         }
     }
 

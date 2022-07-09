@@ -110,6 +110,11 @@ namespace MonoGameView
             _clusterManager.Update(mouseState);
             _combatButton.Update(mouseState);
 
+            foreach (var grid in _grids)
+            {
+                grid?.Update(mouseState);
+            }
+
             base.Update(gameTime);
         }
 
