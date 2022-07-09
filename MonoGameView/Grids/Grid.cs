@@ -12,16 +12,17 @@ namespace MonoGameView.Grids;
 public abstract class Grid
 {
     protected readonly PartValidator Validator;
-    protected PartSocket[][] _sockets;
+    protected readonly PartSocket[][] Sockets;
+
+    private readonly EventHandler<ClusterDraggedArgs> _onStartDrag;
+    private readonly EventHandler<ClusterDraggedArgs> _onEndDrag;
 
     private DraggablePartCluster _currentCluster;
-    private EventHandler<ClusterDraggedArgs> _onStartDrag;
-    private EventHandler<ClusterDraggedArgs> _onEndDrag;
 
     public Grid(int width, int height, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
     {
         Validator = validator;
-        _sockets = new PartSocket[width][];
+        Sockets = new PartSocket[width][];
         _onStartDrag = (sender, eventArgs) =>
         {
             _currentCluster = eventArgs.Cluster;
@@ -37,12 +38,12 @@ public abstract class Grid
         {
             for(var y = 0; y < height; y++)
             {
-                _sockets[y] ??= new PartSocket[height];
-                _sockets[x][y] = new PartSocket(new Vector2(x, y), Constants.SocketSize, Constants.SocketSize, blankTexture, highlightTexture);
+                Sockets[x] ??= new PartSocket[height];
+                Sockets[x][y] ??= new PartSocket(new Vector2(x, y), Constants.SocketSize, Constants.SocketSize, blankTexture, highlightTexture);
             }
         }
     }
-    
+
     protected abstract void UpdateSource();
 
     public void Update(MouseState mouseState)
@@ -56,7 +57,7 @@ public abstract class Grid
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        foreach (var line in _sockets)
+        foreach (var line in Sockets)
         {
             foreach (var socket in line)
             {
@@ -65,9 +66,15 @@ public abstract class Grid
         }
     }
 
+    public void SubscribeToClusterEvents(ClusterManager clusterManager)
+    {
+        clusterManager.StartDrag += _onStartDrag;
+        clusterManager.EndDrag += _onEndDrag;
+    }
+
     private void UnsocketPartsOfCluster(DraggablePartCluster cluster)
     {
-        foreach (var line in _sockets)
+        foreach (var line in Sockets)
         {
             foreach (var socket in line)
             {
@@ -80,7 +87,7 @@ public abstract class Grid
         UpdateSource();
     }
 
-    public void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
+    private void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
     {
         var candidatePairs = GetCandidates(mouseState.Position, cluster, out var clusterPosition);
 
@@ -95,9 +102,9 @@ public abstract class Grid
         }
     }
 
-    public void ClearHighlights()
+    private void ClearHighlights()
     {
-        foreach (var line in _sockets)
+        foreach (var line in Sockets)
         {
             foreach (var socket in line)
             {
@@ -106,7 +113,7 @@ public abstract class Grid
         }
     }
 
-    public void DisplayValidation(Point mouseStatePosition, DraggablePartCluster cluster)
+    private void DisplayValidation(Point mouseStatePosition, DraggablePartCluster cluster)
     {
         var candidates = GetCandidates(mouseStatePosition, cluster, out _);
 
@@ -129,23 +136,17 @@ public abstract class Grid
         }
     }
 
-    public void SubscribeToClusterEvents(ClusterManager clusterManager)
-    {
-        clusterManager.StartDrag += _onStartDrag;
-        clusterManager.EndDrag += _onEndDrag;
-    }
-
-    protected Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)
+    private Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)
     {
         var candidatePairs = new Dictionary<DraggablePart, PartSocket>();
         clusterPosition = new Vector2();
         
         Vector2? socketUnderMouseCoords = null;
-        for (var x = 0; x < _sockets.Length; x++)
+        for (var x = 0; x < Sockets.Length; x++)
         {
-            for (var y = 0; y < _sockets[x].Length; y++)
+            for (var y = 0; y < Sockets[x].Length; y++)
             {
-                if (_sockets[x][y].PointInBounds(mousePosition))
+                if (Sockets[x][y].PointInBounds(mousePosition))
                 {
                     socketUnderMouseCoords = new Vector2(x, y);
                 }
@@ -160,9 +161,9 @@ public abstract class Grid
 
         var shapeCoords = cluster.MousePositionToPartCoords(mousePosition);
         
-        for (var x = 0; x < _sockets.Length; x++)
+        for (var x = 0; x < Sockets.Length; x++)
         {
-            for (var y = 0; y < _sockets[x].Length; y++)
+            for (var y = 0; y < Sockets[x].Length; y++)
             {
                 var draggableToCheck = cluster.GetDraggableAtCoords(x, y);
 
@@ -171,8 +172,8 @@ public abstract class Grid
 
                 // If there is a draggablePart at these indices, and it's either out of bounds or the socked it occupied
                 // then mark that part as invalid using a null value in the dictionary
-                if (offsetX < 0 || offsetX >= _sockets[x].Length || offsetY < 0 || offsetY >= _sockets.Length ||
-                    (draggableToCheck != null && _sockets[offsetX][offsetY].StoredPart != null))
+                if (offsetX < 0 || offsetX >= Sockets[x].Length || offsetY < 0 || offsetY >= Sockets.Length ||
+                    (draggableToCheck != null && Sockets[offsetX][offsetY].StoredPart != null))
                 {
                     if (draggableToCheck != null)
                     {
@@ -181,10 +182,10 @@ public abstract class Grid
                 }
                 else
                 {
-                    if (x == 0 && y == 0) clusterPosition = _sockets[offsetX][offsetY].Position;
+                    if (x == 0 && y == 0) clusterPosition = Sockets[offsetX][offsetY].Position;
                     if (draggableToCheck != null)
                     {
-                        candidatePairs.Add(draggableToCheck, _sockets[offsetX][offsetY]);
+                        candidatePairs.Add(draggableToCheck, Sockets[offsetX][offsetY]);
                     }
                 }
             }

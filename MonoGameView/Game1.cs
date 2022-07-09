@@ -19,7 +19,7 @@ namespace MonoGameView
         private IGolemApiClient _client;
         private GolemGrid _grid1;
         private GolemGrid _grid2;
-        private List<GolemGrid> _grids;
+        private List<Grid> _grids;
         private Button _combatButton;
         private SpriteFont _arialFont;
         private PartValidator _validator;
@@ -36,7 +36,7 @@ namespace MonoGameView
         {
             _client = GolemApiClientFactory.Create();
             _clusterManager = new ClusterManager();
-            _grids = new List<GolemGrid>();
+            _grids = new List<Grid>();
             
             _graphics.PreferredBackBufferWidth = 1000;
             _graphics.PreferredBackBufferHeight = 600;
@@ -78,9 +78,11 @@ namespace MonoGameView
             _grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 500;
             _grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
-
+            Constants.SocketDistanceFromLeft = 30;
+            var storageGrid = new StorageGrid(2, 6, _validator, blankTexture, yellowTexture);
             _grids.Add(_grid1);
             _grids.Add(_grid2);
+            _grids.Add(storageGrid);
             
             foreach (var grid in _grids)
             {

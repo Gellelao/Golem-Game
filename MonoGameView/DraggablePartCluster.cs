@@ -117,6 +117,7 @@ public class DraggablePartCluster
 
     public DraggablePart GetDraggableAtCoords(int x, int y)
     {
+        if (x >= _draggableParts.Length || y >= _draggableParts[0].Length) return null;
         return _draggableParts[x][y];
     }
 

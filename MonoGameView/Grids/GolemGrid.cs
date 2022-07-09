@@ -22,7 +22,7 @@ public class GolemGrid : Grid
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
         var valid = true;
         
-        foreach (var line in _sockets)
+        foreach (var line in Sockets)
         {
             foreach (var socket in line)
             {
