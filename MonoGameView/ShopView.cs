@@ -54,7 +54,7 @@ public class ShopView
         for (int i = 0; i < parts.Count; i++)
         {
             var indexForThisPart = i; // because closures
-            _shopParts.Add(new ShopPart(parts[i], _arialFont, () => BuyPart(indexForThisPart), new Vector2(80 + 80*i, 500), 70, 70, _itemBackround, _buttonTexture));
+            _shopParts.Add(new ShopPart(parts[i], _arialFont, () => BuyPart(indexForThisPart), new Vector2(80 + 150*i, 500), 90, 140, _itemBackround, _buttonTexture));
         }
     }
 

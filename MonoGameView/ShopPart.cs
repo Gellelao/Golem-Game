@@ -1,4 +1,5 @@
 ﻿using System;
+using GolemCore.Extensions;
 using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,7 +17,7 @@ public class ShopPart : Region
     {
         _part = part;
         _font = font;
-        _button = new Button(new Vector2(Position.X+10, Position.Y+40), 30, 30, buttonTexture, buttonAction);
+        _button = new Button(new Vector2(Position.X+100, Position.Y+60), 30, 30, buttonTexture, buttonAction);
     }
 
     public void Update(MouseState mouseState)
@@ -27,7 +28,8 @@ public class ShopPart : Region
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
-        spriteBatch.DrawString(_font, _part.Name, Position, Color.Black);
+        var newPos = new Vector2(Position.X + 2, Position.Y);
+        spriteBatch.DrawString(_font, $"{_part.Name}\n{_part.GetDescription()}", newPos, Color.Black);
         _button.Draw(spriteBatch);
     }
 }
