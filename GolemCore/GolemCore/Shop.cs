@@ -40,13 +40,14 @@ public class Shop
         _currentRound++;
     }
 
-    public bool BuyPartAtIndex(int index)
+    public Part? BuyPartAtIndex(int index)
     {
-        if (index >= _currentParts.Count) return false;
-        if (_playerFunds <= 0) return false;
+        if (index >= _currentParts.Count) return null;
+        if (_playerFunds <= 0) return null;
         
         _playerFunds--;
+        var partBought = _currentParts[index];
         _currentParts.RemoveAt(index);
-        return true;
+        return partBought;
     }
 }

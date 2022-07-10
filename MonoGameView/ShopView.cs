@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GolemCore;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameView.Events;
 
 namespace MonoGameView;
 
 public class ShopView
 {
+    public event EventHandler<PartTransactionArgs> PartBought;
+    public event EventHandler<PartTransactionArgs> PartSold;
+    
     private readonly Shop _shop;
     private readonly Texture2D _itemBackround;
     private readonly Texture2D _buttonTexture;
@@ -57,8 +60,10 @@ public class ShopView
 
     private void BuyPart(int index)
     {
-        Console.WriteLine($"Buying part {index}");
-        _shop.BuyPartAtIndex(index);
+        var partBought = _shop.BuyPartAtIndex(index);
+        if (partBought == null) return;
+
+        PartBought?.Invoke(this, new PartTransactionArgs(partBought));
         GenerateShopParts();
     }
 }
