@@ -43,11 +43,18 @@ public class Shop
     public Part? BuyPartAtIndex(int index)
     {
         if (index >= _currentParts.Count) return null;
+        // In the future the buy price could vary by part, for now each part costs 1
         if (_playerFunds <= 0) return null;
         
         _playerFunds--;
         var partBought = _currentParts[index];
         _currentParts.RemoveAt(index);
         return partBought;
+    }
+
+    public void SellPart(Part part)
+    {
+        // In the future the sell price could vary by part, for now its just one
+        _playerFunds++;
     }
 }

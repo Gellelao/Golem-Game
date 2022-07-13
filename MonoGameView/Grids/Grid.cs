@@ -11,7 +11,6 @@ namespace MonoGameView.Grids;
 
 public abstract class Grid
 {
-    protected readonly PartValidator Validator;
     protected readonly PartSocket[][] Sockets;
 
     private readonly EventHandler<ClusterDraggedArgs> _onStartDrag;
@@ -19,9 +18,8 @@ public abstract class Grid
 
     private DraggablePartCluster _currentCluster;
 
-    protected Grid(int width, int height, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture)
+    protected Grid(int width, int height, Texture2D blankTexture, Texture2D highlightTexture)
     {
-        Validator = validator;
         Sockets = new PartSocket[width][];
         _onStartDrag = (sender, eventArgs) =>
         {
@@ -136,7 +134,7 @@ public abstract class Grid
         }
     }
 
-    private Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)
+    protected virtual Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)
     {
         var candidatePairs = new Dictionary<DraggablePart, PartSocket>();
         clusterPosition = new Vector2();

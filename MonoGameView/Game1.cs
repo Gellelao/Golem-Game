@@ -17,8 +17,6 @@ namespace MonoGameView
         private SpriteBatch _spriteBatch;
         private ShopView _shopView;
         private IGolemApiClient _client;
-        private GolemGrid _grid1;
-        private GolemGrid _grid2;
         private List<Grid> _grids;
         private Button _combatButton;
         private SpriteFont _arialFont;
@@ -81,15 +79,18 @@ namespace MonoGameView
             _validator = new PartValidator(partsCache);
             
             Constants.SocketDistanceFromLeft = 200;
-            _grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
+            var grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 500;
-            _grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
+            var grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 30;
-            var storageGrid = new StorageGrid(2, 6, _validator, blankTexture, yellowTexture);
-            _grids.Add(_grid1);
-            _grids.Add(_grid2);
+            var storageGrid = new StorageGrid(2, 6, blankTexture, yellowTexture);
+            Constants.SocketDistanceFromLeft = 800;
+            var sellGrid = new SellGrid(_shopView, blankTexture, yellowTexture);
+            _grids.Add(grid1);
+            _grids.Add(grid2);
             _grids.Add(storageGrid);
-            
+            _grids.Add(sellGrid);
+
             _clusterManager = new ClusterManager(grayTexture, redTexture, _arialFont);
             
             foreach (var grid in _grids)
@@ -98,11 +99,6 @@ namespace MonoGameView
             }
 
             _clusterManager.SubscribeToShopEvents(_shopView);
-            
-            // for (var i = 0; i < partSelection.Count; i++)
-            // {
-            //     _clusterManager.AddCluster(new DraggablePartCluster(new Vector2(50+ i*125, _graphics.PreferredBackBufferHeight-120), grayTexture, _arialFont, redTexture, partSelection[i]));
-            // }
         }
 
         protected override void Update(GameTime gameTime)

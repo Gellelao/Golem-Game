@@ -14,6 +14,7 @@ public class ClusterManager
     public event EventHandler<ClusterDraggedArgs> EndDrag;
     
     private readonly EventHandler<PartTransactionArgs> _onPartBought;
+    private readonly EventHandler<PartTransactionArgs> _onPartSold;
 
     private readonly LinkedList<DraggablePartCluster> _clusters;
     private DraggablePartCluster _draggedCluster;
@@ -26,6 +27,10 @@ public class ClusterManager
         _onPartBought = (sender, eventArgs) =>
         {
             AddCluster(new DraggablePartCluster(new Vector2(100, 100), grayTexture, arialFont, redTexture, eventArgs.Part));
+        };
+        _onPartSold = (sender, eventArgs) =>
+        {
+            RemoveCluster(eventArgs.Cluster);
         };
     }
 
@@ -94,15 +99,21 @@ public class ClusterManager
     {
         _clusters.AddFirst(cluster);
     }
+
+    private void RemoveCluster(DraggablePartCluster cluster)
+    {
+        _clusters.Remove(cluster);
+    }
     
     private void MoveClusterToFront(DraggablePartCluster cluster)
     {
+        AddCluster(cluster);
         _clusters.Remove(cluster);
-        _clusters.AddFirst(cluster);
     }
 
     public void SubscribeToShopEvents(ShopView shopView)
     {
         shopView.PartBought += _onPartBought;
+        shopView.PartSold += _onPartSold;
     }
 }

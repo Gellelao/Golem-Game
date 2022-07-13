@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using GolemCore;
+using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameView.Events;
+using MonoGameView.Grids;
 
 namespace MonoGameView;
 
@@ -65,5 +67,11 @@ public class ShopView
 
         PartBought?.Invoke(this, new PartTransactionArgs(partBought));
         GenerateShopParts();
+    }
+
+    public void SellCluster(DraggablePartCluster cluster, Part part)
+    {
+        PartSold?.Invoke(this, new PartTransactionArgs(cluster));
+        _shop.SellPart(part);
     }
 }

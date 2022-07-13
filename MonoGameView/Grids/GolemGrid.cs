@@ -10,10 +10,12 @@ namespace MonoGameView.Grids;
 
 public class GolemGrid : Grid
 {
+    protected readonly PartValidator Validator;
     private Golem _golem;
 
-    public GolemGrid(Golem golem, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture) : base(golem.PartIds.Length, golem.PartIds[0].Length, validator, blankTexture, highlightTexture)
+    public GolemGrid(Golem golem, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture) : base(golem.PartIds.Length, golem.PartIds[0].Length, blankTexture, highlightTexture)
     {
+        Validator = validator;
         _golem = golem;
     }
 

@@ -5,7 +5,7 @@ namespace MonoGameView.Grids;
 
 public class StorageGrid : Grid
 {
-    public StorageGrid(int width, int height, PartValidator validator, Texture2D blankTexture, Texture2D highlightTexture) : base(width, height, validator, blankTexture, highlightTexture)
+    public StorageGrid(int width, int height, Texture2D blankTexture, Texture2D highlightTexture) : base(width, height, blankTexture, highlightTexture)
     {
     }
 
