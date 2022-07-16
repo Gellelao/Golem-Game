@@ -122,11 +122,6 @@ public abstract class Grid
     {
         var candidates = GetCandidates(mouseStatePosition, cluster, out _);
 
-        if (!candidates.Any())
-        {
-            cluster.ClearTempInvalids();
-        }
-        
         foreach (var (part, socket) in candidates)
         {
             if (socket == null)

@@ -44,9 +44,11 @@ public class ClusterManager
 
     public void Update(MouseState mouseState)
     {
-        // Rotate
         if (_draggedCluster != null)
         {
+            _draggedCluster.ClearTempInvalids();
+            
+            // Rotate
             if (_rightMousePressed && mouseState.RightButton == ButtonState.Released)
             {
                 _draggedCluster.Rotate();
@@ -84,14 +86,11 @@ public class ClusterManager
                 var clusterDraggedArgs = new ClusterDraggedArgs(_draggedCluster, mouseState);
                 EndDrag?.Invoke(this, clusterDraggedArgs);
 
-                if (clusterDraggedArgs.ClusterWasSocketed)
-                {
-                    _draggedCluster.ClearTempInvalids();
-                }
-                else
+                if (!clusterDraggedArgs.ClusterWasSocketed)
                 {
                     _draggedCluster.RevertToPositionBeforeDrag();
                 }
+                _draggedCluster.ClearTempInvalids();
                 _draggedCluster = null;
             }
         }
@@ -115,8 +114,8 @@ public class ClusterManager
     
     private void MoveClusterToFront(DraggablePartCluster cluster)
     {
+        RemoveCluster(cluster);
         AddCluster(cluster);
-        _clusters.Remove(cluster);
     }
 
     public void SubscribeToShopEvents(ShopView shopView)

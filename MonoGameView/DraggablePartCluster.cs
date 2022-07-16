@@ -150,7 +150,6 @@ public class DraggablePartCluster
 
     public void RevertToPositionBeforeDrag()
     {
-        Console.WriteLine("reverting");
         _position = _dragOrigin;
         UpdatePartPositionsToMatchCluster();
     }
