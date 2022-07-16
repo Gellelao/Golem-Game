@@ -80,10 +80,18 @@ public class ClusterManager
             if (_draggedCluster != null)
             {
                 _draggedCluster.Release();
-                
-                EndDrag?.Invoke(this, new ClusterDraggedArgs(_draggedCluster, mouseState));
-                
-                _draggedCluster.ClearTempInvalids();
+
+                var clusterDraggedArgs = new ClusterDraggedArgs(_draggedCluster, mouseState);
+                EndDrag?.Invoke(this, clusterDraggedArgs);
+
+                if (clusterDraggedArgs.ClusterWasSocketed)
+                {
+                    _draggedCluster.ClearTempInvalids();
+                }
+                else
+                {
+                    _draggedCluster.RevertToPositionBeforeDrag();
+                }
                 _draggedCluster = null;
             }
         }

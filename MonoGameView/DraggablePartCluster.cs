@@ -13,6 +13,7 @@ public class DraggablePartCluster
     private bool _beingDragged;
     private float _xOffsetFromMouse;
     private float _yOffsetFromMouse;
+    private Vector2 _dragOrigin;
     private Vector2 _position;
     private readonly Texture2D _redTexture;
 
@@ -60,17 +61,8 @@ public class DraggablePartCluster
         if (_beingDragged)
         {
             _position = new Vector2(mouseState.X - _xOffsetFromMouse, mouseState.Y - _yOffsetFromMouse);
-            
-            for (var x = 0; x < _draggableParts.Length; x++)
-            {
-                for (var y = 0; y < _draggableParts[x].Length; y++)
-                {
-                    if (_draggableParts[x][y] != null)
-                    {
-                        _draggableParts[x][y].Position = new Vector2(_position.X + x * Constants.PartSize, _position.Y + y * Constants.PartSize);
-                    }
-                }
-            }
+
+            UpdatePartPositionsToMatchCluster();
         }
     }
 
@@ -90,6 +82,7 @@ public class DraggablePartCluster
     public void Grab(MouseState mouseState)
     {
         _beingDragged = true;
+        _dragOrigin = _position;
         _xOffsetFromMouse = mouseState.X - _position.X;
         _yOffsetFromMouse = mouseState.Y - _position.Y;
     }
@@ -155,6 +148,13 @@ public class DraggablePartCluster
         _draggableParts = minimalArray;
     }
 
+    public void RevertToPositionBeforeDrag()
+    {
+        Console.WriteLine("reverting");
+        _position = _dragOrigin;
+        UpdatePartPositionsToMatchCluster();
+    }
+
     private DraggablePart[][] RotateArray(DraggablePart[][] draggableParts)
     {
         var height = draggableParts.Length;
@@ -207,5 +207,19 @@ public class DraggablePartCluster
         }
         
         return newArray;
+    }
+
+    private void UpdatePartPositionsToMatchCluster()
+    {
+        for (var x = 0; x < _draggableParts.Length; x++)
+        {
+            for (var y = 0; y < _draggableParts[x].Length; y++)
+            {
+                if (_draggableParts[x][y] != null)
+                {
+                    _draggableParts[x][y].Position = new Vector2(_position.X + x * Constants.PartSize, _position.Y + y * Constants.PartSize);
+                }
+            }
+        }
     }
 }

@@ -24,13 +24,17 @@ public abstract class Grid
         _onStartDrag = (sender, eventArgs) =>
         {
             _currentCluster = eventArgs.Cluster;
-            UnsocketPartsOfCluster(_currentCluster);
         };
         _onEndDrag = (sender, eventArgs) =>
         {
-            SocketClusterAtMouse(eventArgs.MouseState, eventArgs.Cluster);
+            UnsocketPartsOfCluster(_currentCluster);
+            var clusterSocketed = SocketClusterAtMouse(eventArgs.MouseState, eventArgs.Cluster);
             _currentCluster = null;
             ClearHighlights();
+            if (clusterSocketed)
+            {
+                eventArgs.ClusterSocketed();
+            }
         };
         for(var x = 0; x < width; x++)
         {
@@ -85,7 +89,7 @@ public abstract class Grid
         UpdateSource();
     }
 
-    private void SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
+    private bool SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
     {
         var candidatePairs = GetCandidates(mouseState.Position, cluster, out var clusterPosition);
 
@@ -97,7 +101,10 @@ public abstract class Grid
             }
             cluster.SetPosition(clusterPosition);
             UpdateSource();
+            return true;
         }
+
+        return false;
     }
 
     private void ClearHighlights()
