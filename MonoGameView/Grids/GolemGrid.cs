@@ -99,6 +99,6 @@ public class GolemGrid : Grid
         {
             // only allow the golem to be uploaded if it is valid. But locally we permit an invalid golem
         }
-        Console.WriteLine(_golem);
+        //Console.WriteLine(_golem);
     }
 }

@@ -10,6 +10,8 @@ namespace MonoGameView;
 
 public class DraggablePartCluster
 {
+    public Part Part { get; }
+    
     private DraggablePart[][] _draggableParts;
     private bool _beingDragged;
     private float _xOffsetFromMouse;
@@ -18,7 +20,6 @@ public class DraggablePartCluster
     private Vector2 _position;
     private readonly SpriteFont _arialFont;
     private readonly Texture2D _redTexture;
-    private readonly Part _part;
 
     public DraggablePartCluster(Vector2 position, Texture2D grayTexture, SpriteFont arialFont, Texture2D redTexture,
         Part part)
@@ -27,7 +28,7 @@ public class DraggablePartCluster
         _arialFont = arialFont;
         _draggableParts = new DraggablePart[part.Shape.Length][];
         _redTexture = redTexture;
-        _part = part;
+        Part = part;
         for (var x = 0; x < part.Shape.Length; x++)
         {
             for (var y = 0; y < part.Shape[x].Length; y++)
@@ -59,7 +60,7 @@ public class DraggablePartCluster
             }
         }
         spriteBatch.Draw(_redTexture, _position, new Rectangle((int)_position.X, (int)_position.Y, 10, 10), Color.White);
-        spriteBatch.DrawString(_arialFont, $"{_part.Name}\n{_part.GetDescription()}", _position, Color.Black);
+        spriteBatch.DrawString(_arialFont, $"{Part.Name}\n{Part.GetDescription()}", _position, Color.Black);
     }
 
     public void Update(MouseState mouseState)

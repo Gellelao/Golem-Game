@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GolemCore;
 using GolemCore.Models.Part;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGameView.Events;
 
 namespace MonoGameView;
 
@@ -21,6 +16,13 @@ public class ShopView
         _shop = shop;
         _clusterManager = clusterManager;
         _shopClusters = new List<DraggablePartCluster>();
+        _clusterManager.ClusterSocketed += (sender, eventArgs) =>
+        {
+            if (_shopClusters.Contains(eventArgs.Cluster))
+            {
+                BuyPart(eventArgs.Cluster);
+            }
+        };
         shop.SetPartsForRound();
         GenerateShopParts();
     }
@@ -40,15 +42,26 @@ public class ShopView
         }
     }
 
-    private void BuyPart()
+    private void BuyPart(DraggablePartCluster cluster)
     {
-        // Can take a part or cluster
-        // remove it from local list and clustermanager, inform shop (to remove from shop selection and deduct funds)
+        _shop.BuyPartAtIndex(_shopClusters.IndexOf(cluster));
+        _shopClusters.Remove(cluster); // Relinquish that cluster since it is no longer part of the shop
+        GenerateShopParts();
     }
 
     public void SellCluster(DraggablePartCluster cluster, Part part)
     {
+        if (_shopClusters.Contains(cluster))
+        {
+            cluster.RevertToPositionBeforeDrag();
+            return; // Can't sell parts from the shop!
+        }
         _shop.SellPart(part);
         _clusterManager.RemoveCluster(cluster);
+    }
+
+    public string GetPlayerFunds()
+    {
+        return _shop.PlayerFunds.ToString();
     }
 }

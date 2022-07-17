@@ -33,7 +33,7 @@ public abstract class Grid
             ClearHighlights();
             if (clusterSocketed)
             {
-                eventArgs.ClusterSocketed();
+                eventArgs.ClusterSocketed(this);
             }
         };
         for(var x = 0; x < width; x++)

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameView.Events;
+using MonoGameView.Grids;
 
 namespace MonoGameView;
 
@@ -16,6 +17,7 @@ public class ClusterManager
     private readonly SpriteFont _arialFont;
     public event EventHandler<ClusterDraggedArgs> StartDrag;
     public event EventHandler<ClusterDraggedArgs> EndDrag;
+    public event EventHandler<ClusterDetailArgs> ClusterSocketed;
 
     private readonly LinkedList<DraggablePartCluster> _clusters;
     private DraggablePartCluster _draggedCluster;
@@ -81,7 +83,11 @@ public class ClusterManager
                 var clusterDraggedArgs = new ClusterDraggedArgs(_draggedCluster, mouseState);
                 EndDrag?.Invoke(this, clusterDraggedArgs);
 
-                if (!clusterDraggedArgs.ClusterWasSocketed)
+                if (clusterDraggedArgs.GridClusterWasSocketedTo != null && clusterDraggedArgs.GridClusterWasSocketedTo.GetType() != typeof(SellGrid))
+                {
+                    ClusterSocketed?.Invoke(this, new ClusterDetailArgs(_draggedCluster));
+                }
+                else
                 {
                     _draggedCluster.RevertToPositionBeforeDrag();
                 }

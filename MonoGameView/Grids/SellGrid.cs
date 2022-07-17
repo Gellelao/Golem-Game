@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,9 @@ public class SellGrid : Grid
     {
         var part = Sockets[0][0].StoredPart;
         if (part == null) return;
+        Console.WriteLine($"selling {part.Part.Id}");
         _shopView.SellCluster(part.Parent, part.Part);
+        Sockets[0][0].ClearStorage();
     }
 
     protected override Dictionary<DraggablePart, PartSocket> GetCandidates(Point mousePosition, DraggablePartCluster cluster, out Vector2 clusterPosition)

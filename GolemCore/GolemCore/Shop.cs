@@ -10,7 +10,7 @@ public class Shop
     private readonly Random _random;
 
     private int _currentRound;
-    private int _playerFunds;
+    public int PlayerFunds { get; private set; }
 
     private readonly List<Part> _currentParts;
 
@@ -19,7 +19,7 @@ public class Shop
         _partsCache = partsCache;
         _random = new Random();
         _currentRound = 0;
-        _playerFunds = Constants.StartingFunds;
+        PlayerFunds = Constants.StartingFunds;
         _currentParts = new List<Part>();
     }
 
@@ -44,9 +44,9 @@ public class Shop
     {
         if (index >= _currentParts.Count) return null;
         // In the future the buy price could vary by part, for now each part costs 1
-        if (_playerFunds <= 0) return null;
+        if (PlayerFunds <= 0) return null;
         
-        _playerFunds--;
+        PlayerFunds--;
         var partBought = _currentParts[index];
         _currentParts.RemoveAt(index);
         return partBought;
@@ -55,6 +55,6 @@ public class Shop
     public void SellPart(Part part)
     {
         // In the future the sell price could vary by part, for now its just one
-        _playerFunds++;
+        PlayerFunds++;
     }
 }

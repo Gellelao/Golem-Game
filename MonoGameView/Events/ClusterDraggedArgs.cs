@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Input;
+using MonoGameView.Grids;
 
 namespace MonoGameView.Events;
 
@@ -8,17 +9,17 @@ public class ClusterDraggedArgs : EventArgs
     public DraggablePartCluster Cluster{ get; }
     public MouseState MouseState { get; }
     
-    public bool ClusterWasSocketed { get; private set; }
+    public Grid GridClusterWasSocketedTo { get; private set; }
 
     public ClusterDraggedArgs(DraggablePartCluster cluster, MouseState mouseState)
     {
         Cluster = cluster;
         MouseState = mouseState;
-        ClusterWasSocketed = false;
+        GridClusterWasSocketedTo = null;
     }
 
-    public void ClusterSocketed()
+    public void ClusterSocketed(Grid receiver)
     {
-        ClusterWasSocketed = true;
+        GridClusterWasSocketedTo = receiver;
     }
 }

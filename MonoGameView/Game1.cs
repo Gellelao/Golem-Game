@@ -71,8 +71,12 @@ namespace MonoGameView
             var partsCache = new PartsCache(parts);
 
             _combatButton = new Button(new Vector2(450, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
-            
+
             var shop = new Shop(partsCache);
+
+            _clusterManager = new ClusterManager(grayTexture, redTexture, _arialFont);
+
+            _shopView = new ShopView(shop, _clusterManager);
 
             _validator = new PartValidator(partsCache);
             
@@ -88,15 +92,11 @@ namespace MonoGameView
             _grids.Add(grid2);
             _grids.Add(storageGrid);
             _grids.Add(sellGrid);
-
-            _clusterManager = new ClusterManager(grayTexture, redTexture, _arialFont);
             
             foreach (var grid in _grids)
             {
                 grid?.SubscribeToClusterEvents(_clusterManager);
             }
-
-            _shopView = new ShopView(shop, _clusterManager);
         }
 
         protected override void Update(GameTime gameTime)
@@ -130,6 +130,11 @@ namespace MonoGameView
             }
             _combatButton.Draw(_spriteBatch);
             _clusterManager?.DrawClusters(_spriteBatch);
+
+            if (_shopView != null)
+            {
+                _spriteBatch.DrawString(_arialFont, $"{_shopView.GetPlayerFunds()}", new Vector2(20, 20), Color.Black);
+            }
             
             _spriteBatch.End();
 
