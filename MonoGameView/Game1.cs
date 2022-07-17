@@ -74,8 +74,6 @@ namespace MonoGameView
             
             var shop = new Shop(partsCache);
 
-            _shopView = new ShopView(shop, yellowTexture, buttonTexture, _arialFont);
-
             _validator = new PartValidator(partsCache);
             
             Constants.SocketDistanceFromLeft = 200;
@@ -98,7 +96,7 @@ namespace MonoGameView
                 grid?.SubscribeToClusterEvents(_clusterManager);
             }
 
-            _clusterManager.SubscribeToShopEvents(_shopView);
+            _shopView = new ShopView(shop, _clusterManager);
         }
 
         protected override void Update(GameTime gameTime)
@@ -112,7 +110,6 @@ namespace MonoGameView
 
             _clusterManager?.Update(mouseState);
             _combatButton.Update(mouseState);
-            _shopView?.Update(mouseState);
 
             foreach (var grid in _grids)
             {
@@ -132,7 +129,6 @@ namespace MonoGameView
                 grid?.Draw(_spriteBatch);
             }
             _combatButton.Draw(_spriteBatch);
-            _shopView?.Draw(_spriteBatch);
             _clusterManager?.DrawClusters(_spriteBatch);
             
             _spriteBatch.End();

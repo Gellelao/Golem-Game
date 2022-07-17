@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using GolemCore.Extensions;
 using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,14 +16,18 @@ public class DraggablePartCluster
     private float _yOffsetFromMouse;
     private Vector2 _dragOrigin;
     private Vector2 _position;
+    private readonly SpriteFont _arialFont;
     private readonly Texture2D _redTexture;
+    private readonly Part _part;
 
     public DraggablePartCluster(Vector2 position, Texture2D grayTexture, SpriteFont arialFont, Texture2D redTexture,
         Part part)
     {
         _position = position;
+        _arialFont = arialFont;
         _draggableParts = new DraggablePart[part.Shape.Length][];
         _redTexture = redTexture;
+        _part = part;
         for (var x = 0; x < part.Shape.Length; x++)
         {
             for (var y = 0; y < part.Shape[x].Length; y++)
@@ -54,6 +59,7 @@ public class DraggablePartCluster
             }
         }
         spriteBatch.Draw(_redTexture, _position, new Rectangle((int)_position.X, (int)_position.Y, 10, 10), Color.White);
+        spriteBatch.DrawString(_arialFont, $"{_part.Name}\n{_part.GetDescription()}", _position, Color.Black);
     }
 
     public void Update(MouseState mouseState)

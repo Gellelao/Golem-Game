@@ -1,77 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GolemCore;
 using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameView.Events;
-using MonoGameView.Grids;
 
 namespace MonoGameView;
 
 public class ShopView
 {
-    public event EventHandler<PartTransactionArgs> PartBought;
-    public event EventHandler<PartTransactionArgs> PartSold;
-    
     private readonly Shop _shop;
-    private readonly Texture2D _itemBackround;
-    private readonly Texture2D _buttonTexture;
-    private readonly SpriteFont _arialFont;
-    private List<ShopPart> _shopParts;
+    private readonly ClusterManager _clusterManager;
+    private List<DraggablePartCluster> _shopClusters;
 
-    public ShopView(Shop shop, Texture2D yellowTexture, Texture2D buttonTexture,
-        SpriteFont arialFont)
+    public ShopView(Shop shop, ClusterManager clusterManager)
     {
         _shop = shop;
-        _itemBackround = yellowTexture;
-        _buttonTexture = buttonTexture;
-        _arialFont = arialFont;
-        _shopParts = new List<ShopPart>();
+        _clusterManager = clusterManager;
+        _shopClusters = new List<DraggablePartCluster>();
         shop.SetPartsForRound();
         GenerateShopParts();
     }
 
-    public void Update(MouseState mouseState)
-    {
-        foreach (var shopPart in _shopParts)
-        {
-            shopPart.Update(mouseState);
-        }
-    }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-        foreach (var shopPart in _shopParts)
-        {
-            shopPart.Draw(spriteBatch);
-        }
-    }
-
     private void GenerateShopParts()
     {
+        if (_shopClusters.Any())
+        {
+            _clusterManager.RemoveAllClusters(_shopClusters);
+        }
+
         var parts = _shop.GetCurrentSelection();
-        _shopParts = new List<ShopPart>();
+        _shopClusters = new List<DraggablePartCluster>();
         for (int i = 0; i < parts.Count; i++)
         {
-            var indexForThisPart = i; // because closures
-            _shopParts.Add(new ShopPart(parts[i], _arialFont, () => BuyPart(indexForThisPart), new Vector2(80 + 150*i, 500), 90, 140, _itemBackround, _buttonTexture));
+            _shopClusters.Add(_clusterManager.CreateCluster(parts[i], 80 + 150*i, 500));
         }
     }
 
-    private void BuyPart(int index)
+    private void BuyPart()
     {
-        var partBought = _shop.BuyPartAtIndex(index);
-        if (partBought == null) return;
-
-        PartBought?.Invoke(this, new PartTransactionArgs(partBought));
-        GenerateShopParts();
+        // Can take a part or cluster
+        // remove it from local list and clustermanager, inform shop (to remove from shop selection and deduct funds)
     }
 
     public void SellCluster(DraggablePartCluster cluster, Part part)
     {
-        PartSold?.Invoke(this, new PartTransactionArgs(cluster));
         _shop.SellPart(part);
+        _clusterManager.RemoveCluster(cluster);
     }
 }

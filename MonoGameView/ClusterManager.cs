@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GolemCore.Models.Part;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,11 +11,11 @@ namespace MonoGameView;
 
 public class ClusterManager
 {
+    private readonly Texture2D _grayTexture;
+    private readonly Texture2D _redTexture;
+    private readonly SpriteFont _arialFont;
     public event EventHandler<ClusterDraggedArgs> StartDrag;
     public event EventHandler<ClusterDraggedArgs> EndDrag;
-    
-    private readonly EventHandler<PartTransactionArgs> _onPartBought;
-    private readonly EventHandler<PartTransactionArgs> _onPartSold;
 
     private readonly LinkedList<DraggablePartCluster> _clusters;
     private DraggablePartCluster _draggedCluster;
@@ -22,16 +23,10 @@ public class ClusterManager
 
     public ClusterManager(Texture2D grayTexture, Texture2D redTexture, SpriteFont arialFont)
     {
+        _grayTexture = grayTexture;
+        _redTexture = redTexture;
+        _arialFont = arialFont;
         _clusters = new LinkedList<DraggablePartCluster>();
-        
-        _onPartBought = (sender, eventArgs) =>
-        {
-            AddCluster(new DraggablePartCluster(new Vector2(100, 100), grayTexture, arialFont, redTexture, eventArgs.Part));
-        };
-        _onPartSold = (sender, eventArgs) =>
-        {
-            RemoveCluster(eventArgs.Cluster);
-        };
     }
 
     public void DrawClusters(SpriteBatch spriteBatch)
@@ -102,12 +97,19 @@ public class ClusterManager
         }
     }
 
+    public DraggablePartCluster CreateCluster(Part part, int x, int y)
+    {
+        var cluster = new DraggablePartCluster(new Vector2(x, y), _grayTexture, _arialFont, _redTexture, part);
+        AddCluster(cluster);
+        return cluster;
+    }
+
     private void AddCluster(DraggablePartCluster cluster)
     {
         _clusters.AddFirst(cluster);
     }
 
-    private void RemoveCluster(DraggablePartCluster cluster)
+    public void RemoveCluster(DraggablePartCluster cluster)
     {
         _clusters.Remove(cluster);
     }
@@ -118,9 +120,11 @@ public class ClusterManager
         AddCluster(cluster);
     }
 
-    public void SubscribeToShopEvents(ShopView shopView)
+    public void RemoveAllClusters(List<DraggablePartCluster> clustersToRemove)
     {
-        shopView.PartBought += _onPartBought;
-        shopView.PartSold += _onPartSold;
+        foreach (var cluster in clustersToRemove)
+        {
+            _clusters.Remove(cluster);
+        }
     }
 }
