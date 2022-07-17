@@ -22,6 +22,7 @@ namespace MonoGameView
         private SpriteFont _arialFont;
         private PartValidator _validator;
         private ClusterManager _clusterManager;
+        private Button _rerollButton;
 
         public Game1()
         {
@@ -55,11 +56,11 @@ namespace MonoGameView
             
             var buttonTexture = new Texture2D(GraphicsDevice, 1, 1);
             buttonTexture.SetData(new[] { Color.ForestGreen });
+
+            _arialFont = Content.Load<SpriteFont>("Arial");
             
             // Do this now so that its not null by the time Draw() is called
-            _combatButton = new Button(new Vector2(350, 200), 20, 40, buttonTexture, null);
-            
-            _arialFont = Content.Load<SpriteFont>("Arial");
+            _combatButton = new Button("Fight", new Vector2(350, 200), 20, 40, buttonTexture, _arialFont, null);
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -70,7 +71,8 @@ namespace MonoGameView
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
 
-            _combatButton = new Button(new Vector2(450, 200), 20, 40, buttonTexture, () => PrintOutcome(golem1, golem2, partsCache));
+            _combatButton = new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => PrintOutcome(golem1, golem2, partsCache));
+            _rerollButton = new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll());
 
             var shop = new Shop(partsCache);
 
@@ -110,6 +112,7 @@ namespace MonoGameView
 
             _clusterManager?.Update(mouseState);
             _combatButton.Update(mouseState);
+            _rerollButton?.Update(mouseState);
 
             foreach (var grid in _grids)
             {
@@ -129,6 +132,7 @@ namespace MonoGameView
                 grid?.Draw(_spriteBatch);
             }
             _combatButton.Draw(_spriteBatch);
+            _rerollButton?.Draw(_spriteBatch);
             _clusterManager?.DrawClusters(_spriteBatch);
 
             if (_shopView != null)

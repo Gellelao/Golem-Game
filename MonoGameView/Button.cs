@@ -7,11 +7,15 @@ namespace MonoGameView;
 
 public class Button : Region
 {
+    private readonly string _name;
+    private readonly SpriteFont _font;
     private readonly Action _action;
     private bool _pressed;
 
-    public Button(Vector2 position, int height, int width, Texture2D texture, Action action) : base(position, height, width, texture)
+    public Button(string name, Vector2 position, int height, int width, Texture2D texture, SpriteFont font, Action action) : base(position, height, width, texture)
     {
+        _name = name;
+        _font = font;
         _action = action;
     }
 
@@ -22,5 +26,11 @@ public class Button : Region
             _action.Invoke();
         }
         _pressed = mouseState.LeftButton == ButtonState.Pressed && PointInBounds(mouseState.Position);
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        spriteBatch.DrawString(_font, _name, Position, Color.White);
     }
 }

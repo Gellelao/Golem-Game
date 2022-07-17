@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GolemCore;
 using GolemCore.Models.Part;
@@ -23,6 +24,7 @@ public class ShopView
                 BuyPart(eventArgs.Cluster);
             }
         };
+        _shop.PlayerFundsChanged += DisableUnbuyableParts;
         shop.SetPartsForRound();
         GenerateShopParts();
     }
@@ -38,7 +40,17 @@ public class ShopView
         _shopClusters = new List<DraggablePartCluster>();
         for (int i = 0; i < parts.Count; i++)
         {
-            _shopClusters.Add(_clusterManager.CreateCluster(parts[i], 80 + 150*i, 500));
+            var newCluster = _clusterManager.CreateCluster(parts[i], 80 + 150 * i, 500);
+            _shopClusters.Add(newCluster);
+        }
+    }
+
+    private void DisableUnbuyableParts()
+    {
+        Console.WriteLine("Disabling unbuyable parts!");
+        foreach (var cluster in _shopClusters)
+        {
+            cluster.DraggingEnabled = _shop.CanAfford(cluster.Part);
         }
     }
 
@@ -63,5 +75,11 @@ public class ShopView
     public string GetPlayerFunds()
     {
         return _shop.PlayerFunds.ToString();
+    }
+
+    public void Reroll()
+    {
+        _shop.SetPartsForRound();
+        GenerateShopParts();
     }
 }

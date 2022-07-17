@@ -1,10 +1,11 @@
-﻿using GolemCore.Models;
-using GolemCore.Models.Part;
+﻿using GolemCore.Models.Part;
 
 namespace GolemCore;
 
 public class Shop
 {
+    public event Action PlayerFundsChanged;
+    
     private readonly PartsCache _partsCache;
     private const int StartingPartCount = Constants.StartingShopPartCount;
     private readonly Random _random;
@@ -31,7 +32,7 @@ public class Shop
     public void SetPartsForRound()
     {
         var randomizedParts = _partsCache.GetAllParts().OrderBy(s => _random.NextDouble());
-        
+        _currentParts.Clear();
         _currentParts.AddRange(randomizedParts.Take(_currentRound+StartingPartCount));
     }
 
@@ -40,21 +41,28 @@ public class Shop
         _currentRound++;
     }
 
-    public Part? BuyPartAtIndex(int index)
+    public bool BuyPartAtIndex(int index)
     {
-        if (index >= _currentParts.Count) return null;
+        if (index >= _currentParts.Count) return false;
         // In the future the buy price could vary by part, for now each part costs 1
-        if (PlayerFunds <= 0) return null;
+        if (PlayerFunds <= 0) return false;
         
         PlayerFunds--;
-        var partBought = _currentParts[index];
+        PlayerFundsChanged();
         _currentParts.RemoveAt(index);
-        return partBought;
+        return true;
     }
 
     public void SellPart(Part part)
     {
         // In the future the sell price could vary by part, for now its just one
         PlayerFunds++;
+        PlayerFundsChanged();
+    }
+
+    public bool CanAfford(Part part)
+    {
+        Console.WriteLine($"Can affor part {part.Id}: {PlayerFunds > 0}");
+        return PlayerFunds > 0;
     }
 }

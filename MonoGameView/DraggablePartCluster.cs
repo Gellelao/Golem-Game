@@ -11,7 +11,8 @@ namespace MonoGameView;
 public class DraggablePartCluster
 {
     public Part Part { get; }
-    
+    public bool DraggingEnabled { get; set; }
+
     private DraggablePart[][] _draggableParts;
     private bool _beingDragged;
     private float _xOffsetFromMouse;
@@ -28,6 +29,7 @@ public class DraggablePartCluster
         _arialFont = arialFont;
         _draggableParts = new DraggablePart[part.Shape.Length][];
         _redTexture = redTexture;
+        DraggingEnabled = true;
         Part = part;
         for (var x = 0; x < part.Shape.Length; x++)
         {
@@ -59,8 +61,7 @@ public class DraggablePartCluster
                 part.Draw(spriteBatch);
             }
         }
-        spriteBatch.Draw(_redTexture, _position, new Rectangle((int)_position.X, (int)_position.Y, 10, 10), Color.White);
-        spriteBatch.DrawString(_arialFont, $"{Part.Name}\n{Part.GetDescription()}", _position, Color.Black);
+        spriteBatch.DrawString(_arialFont, $"{Part.Name}\n{Part.GetDescription()}", _position, Color.SkyBlue);
     }
 
     public void Update(MouseState mouseState)
@@ -88,6 +89,8 @@ public class DraggablePartCluster
 
     public void Grab(MouseState mouseState)
     {
+        Console.WriteLine($"Dragging enabled: {DraggingEnabled}");
+        if (!DraggingEnabled) return;
         _beingDragged = true;
         _dragOrigin = _position;
         _xOffsetFromMouse = mouseState.X - _position.X;
