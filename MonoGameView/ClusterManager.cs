@@ -61,11 +61,13 @@ public class ClusterManager
             {
                 if (cluster.GetDraggableUnderMouse(mouseState.Position) == null) continue;
                 
+                var grabbed = cluster.Grab(mouseState);
+                if (!grabbed) continue;
+                
                 _draggedCluster = cluster;
                 
                 MoveClusterToFront(cluster);
                 cluster.SetInvalidOnAllParts(false);
-                cluster.Grab(mouseState);
                 
                 StartDrag?.Invoke(this, new ClusterDraggedArgs(_draggedCluster, mouseState));
                 

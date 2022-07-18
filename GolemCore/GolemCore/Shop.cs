@@ -4,8 +4,6 @@ namespace GolemCore;
 
 public class Shop
 {
-    public event Action PlayerFundsChanged;
-    
     private readonly PartsCache _partsCache;
     private const int StartingPartCount = Constants.StartingShopPartCount;
     private readonly Random _random;
@@ -48,7 +46,6 @@ public class Shop
         if (PlayerFunds <= 0) return false;
         
         PlayerFunds--;
-        PlayerFundsChanged();
         _currentParts.RemoveAt(index);
         return true;
     }
@@ -57,12 +54,10 @@ public class Shop
     {
         // In the future the sell price could vary by part, for now its just one
         PlayerFunds++;
-        PlayerFundsChanged();
     }
 
     public bool CanAfford(Part part)
     {
-        Console.WriteLine($"Can affor part {part.Id}: {PlayerFunds > 0}");
         return PlayerFunds > 0;
     }
 }

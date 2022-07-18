@@ -24,7 +24,6 @@ public class ShopView
                 BuyPart(eventArgs.Cluster);
             }
         };
-        _shop.PlayerFundsChanged += DisableUnbuyableParts;
         shop.SetPartsForRound();
         GenerateShopParts();
     }
@@ -43,11 +42,12 @@ public class ShopView
             var newCluster = _clusterManager.CreateCluster(parts[i], 80 + 150 * i, 500);
             _shopClusters.Add(newCluster);
         }
+        
+        UpdatePurchasability();
     }
 
-    private void DisableUnbuyableParts()
+    private void UpdatePurchasability()
     {
-        Console.WriteLine("Disabling unbuyable parts!");
         foreach (var cluster in _shopClusters)
         {
             cluster.DraggingEnabled = _shop.CanAfford(cluster.Part);
@@ -70,6 +70,8 @@ public class ShopView
         }
         _shop.SellPart(part);
         _clusterManager.RemoveCluster(cluster);
+        
+        UpdatePurchasability();
     }
 
     public string GetPlayerFunds()

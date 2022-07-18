@@ -18,7 +18,6 @@ public class SellGrid : Grid
     {
         var part = Sockets[0][0].StoredPart;
         if (part == null) return;
-        Console.WriteLine($"selling {part.Part.Id}");
         _shopView.SellCluster(part.Parent, part.Part);
         Sockets[0][0].ClearStorage();
     }

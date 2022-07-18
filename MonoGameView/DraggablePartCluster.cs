@@ -87,14 +87,14 @@ public class DraggablePartCluster
         return null;
     }
 
-    public void Grab(MouseState mouseState)
+    public bool Grab(MouseState mouseState)
     {
-        Console.WriteLine($"Dragging enabled: {DraggingEnabled}");
-        if (!DraggingEnabled) return;
+        if (!DraggingEnabled) return false;
         _beingDragged = true;
         _dragOrigin = _position;
         _xOffsetFromMouse = mouseState.X - _position.X;
         _yOffsetFromMouse = mouseState.Y - _position.Y;
+        return true;
     }
 
     public void Release()
