@@ -152,7 +152,7 @@ namespace MonoGameView
             base.Draw(gameTime);
         }
 
-        private async Task OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
+        private void OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
         {
             if (!GolemGridsAreValid()) return;
             var results = CombatResolver.GetOutcome(golem1, golem2, cache);

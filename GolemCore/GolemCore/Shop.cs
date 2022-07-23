@@ -5,7 +5,6 @@ namespace GolemCore;
 public class Shop
 {
     private readonly PartsCache _partsCache;
-    private const int StartingPartCount = Constants.StartingShopPartCount;
     private readonly Random _random;
 
     private int _currentRound;
@@ -31,7 +30,8 @@ public class Shop
     {
         var randomizedParts = _partsCache.GetAllParts().OrderBy(s => _random.NextDouble());
         _currentParts.Clear();
-        _currentParts.AddRange(randomizedParts.Take(_currentRound+StartingPartCount));
+        // could include _currentRound here to display more parts as rounds progress
+        _currentParts.AddRange(randomizedParts.Take(Constants.StartingShopPartCount));
     }
 
     public void IncrementRound()
