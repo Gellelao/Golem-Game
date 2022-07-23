@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Models.Golem;
 using GolemCore.Validation;
@@ -23,6 +24,7 @@ namespace MonoGameView
         private PartValidator _validator;
         private ClusterManager _clusterManager;
         private Button _rerollButton;
+        private ResultProjector _resultProjector;
 
         public Game1()
         {
@@ -36,7 +38,7 @@ namespace MonoGameView
             _client = GolemApiClientFactory.Create();
             _grids = new List<Grid>();
             
-            _graphics.PreferredBackBufferWidth = 1000;
+            _graphics.PreferredBackBufferWidth = 1500;
             _graphics.PreferredBackBufferHeight = 600;
             _graphics.ApplyChanges();
             base.Initialize();
@@ -67,6 +69,8 @@ namespace MonoGameView
             
             var redTexture = new Texture2D(GraphicsDevice, 1, 1);
             redTexture.SetData(new[] { Color.IndianRed });
+            
+            _resultProjector = new ResultProjector(_arialFont, grayTexture);
 
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
@@ -113,6 +117,7 @@ namespace MonoGameView
             _clusterManager?.Update(mouseState);
             _combatButton.Update(mouseState);
             _rerollButton?.Update(mouseState);
+            _resultProjector?.Update(mouseState);
 
             foreach (var grid in _grids)
             {
@@ -134,6 +139,7 @@ namespace MonoGameView
             _combatButton.Draw(_spriteBatch);
             _rerollButton?.Draw(_spriteBatch);
             _clusterManager?.DrawClusters(_spriteBatch);
+            _resultProjector?.Draw(_spriteBatch);
 
             if (_shopView != null)
             {
@@ -145,14 +151,11 @@ namespace MonoGameView
             base.Draw(gameTime);
         }
 
-        private void PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
+        private async Task PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
         {
             var results = CombatResolver.GetOutcome(golem1, golem2, cache);
 
-            foreach (var result in results)
-            {
-                Console.WriteLine(result);
-            }
+            _resultProjector.SetResults(results);
         }
     }
 }
