@@ -39,6 +39,11 @@ public class Shop
         _currentRound++;
     }
 
+    public void IncrementFunds()
+    {
+        PlayerFunds++;
+    }
+
     public bool BuyPartAtIndex(int index)
     {
         if (index >= _currentParts.Count) return false;

@@ -25,6 +25,7 @@ namespace MonoGameView
         private ClusterManager _clusterManager;
         private Button _rerollButton;
         private ResultProjector _resultProjector;
+        private Shop _shop;
 
         public Game1()
         {
@@ -75,14 +76,14 @@ namespace MonoGameView
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
 
-            _combatButton = new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => PrintOutcome(golem1, golem2, partsCache));
+            _combatButton = new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache));
             _rerollButton = new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll());
 
-            var shop = new Shop(partsCache);
+            _shop = new Shop(partsCache);
 
             _clusterManager = new ClusterManager(grayTexture, redTexture, _arialFont);
 
-            _shopView = new ShopView(shop, _clusterManager);
+            _shopView = new ShopView(_shop, _clusterManager);
 
             _validator = new PartValidator(partsCache);
             
@@ -151,11 +152,31 @@ namespace MonoGameView
             base.Draw(gameTime);
         }
 
-        private async Task PrintOutcome(Golem golem1, Golem golem2, PartsCache cache)
+        private async Task OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
         {
+            if (!GolemGridsAreValid()) return;
             var results = CombatResolver.GetOutcome(golem1, golem2, cache);
 
             _resultProjector.SetResults(results);
+            
+            _shop.IncrementRound();
+            _shop.IncrementFunds();
+            _shopView.Reroll();
+        }
+
+        private bool GolemGridsAreValid()
+        {
+            foreach (var grid in _grids)
+            {
+                switch (grid)
+                {
+                    case GolemGrid golemGrid:
+                        if (!golemGrid.Valid) return false;
+                        break;
+                }
+            }
+
+            return true;
         }
     }
 }

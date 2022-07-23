@@ -10,23 +10,21 @@ public class ResultProjector
 {
     private List<string> _results;
     private int _numberOfResultsToDisplay;
-    private SpriteFont _arialFont;
-    private Button _nextButton;
-    private Button _endButton;
+    private readonly SpriteFont _arialFont;
+    private readonly Button _clearButton;
 
     public ResultProjector(SpriteFont arialFont, Texture2D buttonTexture)
     {
         _arialFont = arialFont;
         _results = new List<string>();
         _numberOfResultsToDisplay = 1;
-        _nextButton = new Button("Next", new Vector2(800, 500), 30, 30, buttonTexture, arialFont, Next);
-        _endButton = new Button("End", new Vector2(850, 500), 30, 30, buttonTexture, arialFont, End);
+        _clearButton = new Button("Clear", new Vector2(800, 500), 30, 30, buttonTexture, arialFont, Clear);
     }
 
     public void SetResults(List<string> results)
     {
-        _numberOfResultsToDisplay = 1;
         _results = results;
+        _numberOfResultsToDisplay = _results.Count;
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -37,27 +35,12 @@ public class ResultProjector
             var position = new Vector2(800, 120 + i * 20);
             spriteBatch.DrawString(_arialFont, _results[i], position, Color.Black);
         }
-        _nextButton.Draw(spriteBatch);
-        _endButton.Draw(spriteBatch);
+        _clearButton.Draw(spriteBatch);
     }
 
     public void Update(MouseState mouseState)
     {
-        _nextButton.Update(mouseState);
-        _endButton.Update(mouseState);
-    }
-
-    public void Next()
-    {
-        if (_numberOfResultsToDisplay < _results.Count)
-        {
-            _numberOfResultsToDisplay++;
-        }
-    }
-
-    public void End()
-    {
-        _numberOfResultsToDisplay = _results.Count;
+        _clearButton.Update(mouseState);
     }
 
     public void Clear()

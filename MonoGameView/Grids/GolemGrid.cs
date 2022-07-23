@@ -10,6 +10,7 @@ namespace MonoGameView.Grids;
 
 public class GolemGrid : Grid
 {
+    public bool Valid { get; private set; }
     protected readonly PartValidator Validator;
     private Golem _golem;
 
@@ -95,10 +96,9 @@ public class GolemGrid : Grid
             }
         }
 
-        if (valid)
-        {
-            // only allow the golem to be uploaded if it is valid. But locally we permit an invalid golem
-        }
+        // only allow the golem to be uploaded if it is valid. But locally we permit an invalid golem
+        Valid = valid;
+        
         //Console.WriteLine(_golem);
     }
 }
