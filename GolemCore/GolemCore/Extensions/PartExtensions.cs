@@ -12,6 +12,14 @@ public static class PartExtensions
         foreach (var stat in part.Stats)
         {
             builder.AppendLine($"{(stat.Modifier > 0 ? "+" : "")}{stat.Modifier} {Enum.GetName(typeof(StatType), stat.Type)}");
+            if (stat.StatMultiplier != null)
+            {
+                builder.AppendLine($"For each {stat.StatMultiplier}");
+            }
+            if (stat.Condition != null)
+            {
+                builder.AppendLine($"Only if this part has {stat.Condition}");
+            }
         }
 
         foreach (var tag in part.Tags)

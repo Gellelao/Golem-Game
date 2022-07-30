@@ -5,8 +5,6 @@ using static Utils.PartsManager;
 
 Console.WriteLine("Hello, World!");
 
-await WritePartsFromDatabaseIntoFile("test.json");
-
 var newParts = new List<Part>
 {
     new()
@@ -14,7 +12,7 @@ var newParts = new List<Part>
         Id = 0,
         Name = "Hand",
         Tier = Tier.Common,
-        Tags = new[] {PartTag.Grabby},
+        Tags = new List<PartTag>{PartTag.Grabby},
         Stats = new List<Stat>
         {
             new()
@@ -34,15 +32,13 @@ var newParts = new List<Part>
             new[] {true, true, false, false},
             new[] {false, false, false, false},
             new[] {false, false, false, false}
-        },
-        Restrictions = new List<NeighbourhoodRequirement>()
+        }
     },
     new()
     {
         Id = 1,
         Name = "Orb",
         Tier = Tier.Common,
-        Tags = Array.Empty<PartTag>(),
         Stats = new List<Stat>
         {
             new()
@@ -55,13 +51,6 @@ var newParts = new List<Part>
                 Modifier = 3,
                 Type = StatType.Health
             }
-        },
-        Shape = new[]
-        {
-            new[] {true, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
         },
         Restrictions = new List<NeighbourhoodRequirement>
         {
@@ -78,7 +67,7 @@ var newParts = new List<Part>
         Id = 2,
         Name = "Ember",
         Tier = Tier.Common,
-        Tags = new [] {PartTag.Fire},
+        Tags = new List<PartTag>{PartTag.Fire},
         Stats = new List<Stat>
         {
             new()
@@ -91,22 +80,13 @@ var newParts = new List<Part>
                     Tag = PartTag.Fire
                 }
             },
-        },
-        Shape = new[]
-        {
-            new[] {true, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
-        },
-        Restrictions = new List<NeighbourhoodRequirement>()
+        }
     },
     new()
     {
         Id = 3,
         Name = "Stone",
         Tier = Tier.Common,
-        Tags = Array.Empty<PartTag>(),
         Stats = new List<Stat>
         {
             new()
@@ -127,15 +107,14 @@ var newParts = new List<Part>
             new[] {true, false, false, false},
             new[] {true, false, false, false},
             new[] {true, false, false, false}
-        },
-        Restrictions = new List<NeighbourhoodRequirement>()
+        }
     },
     new()
     {
         Id = 4,
         Name = "Mossball",
         Tier = Tier.Common,
-        Tags = new [] {PartTag.Mossy},
+        Tags = new List<PartTag>{PartTag.Mossy},
         Stats = new List<Stat>
         {
             new()
@@ -150,13 +129,15 @@ var newParts = new List<Part>
             new[] {false, false, false, false},
             new[] {false, false, false, false},
             new[] {false, false, false, false}
-        },
-        Restrictions = new List<NeighbourhoodRequirement>()
+        }
     }
 };
 
 await PostAllParts(newParts);
 
+await WritePartsFromDatabaseIntoFile("test.json");
+
+Console.WriteLine("Done");
 
 // Updating without just PUTting a new itme with the same id:
 

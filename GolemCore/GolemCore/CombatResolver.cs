@@ -1,4 +1,5 @@
 ﻿using GolemCore.Extensions;
+using GolemCore.Models;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 
@@ -58,7 +59,7 @@ public class CombatResolver
           if (seenParts.Contains(id)) continue;
           seenParts.Add(id);
           var part = _cache.Get(id.ToPartId());
-          sum += part.Stats.Where(stat => stat.Type == typeToSum).Sum(stat => stat.Modifier);
+          sum += part.Stats.Where(s => s.Type == typeToSum).Sum(stat => stat.CalculateTotalModifier(id, _golem, _cache));
         }
       }
 

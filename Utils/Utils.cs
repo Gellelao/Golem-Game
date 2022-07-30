@@ -13,8 +13,11 @@ public static class PartsManager
     var client = (GolemApiClient)GolemApiClientFactory.Create();
     var parts = await client.GetParts(new CancellationToken());
 
+    var options = client.Options;
+    options.WriteIndented = true;
+
     await using var fileStream = File.Create(fileName);
-    await JsonSerializer.SerializeAsync(fileStream, parts, client.Options);
+    await JsonSerializer.SerializeAsync(fileStream, parts, options);
     await fileStream.DisposeAsync();
   }
 

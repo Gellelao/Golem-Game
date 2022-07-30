@@ -28,9 +28,15 @@ public class NeighbourhoodRequirement : Neighbourhood
         }
     }
 
+    public override string ToString()
+    {
+        return
+            $"{Enum.GetName(typeof(Requirement), Requirement)} {Enum.GetName(typeof(Locator), Locator)} {Enum.GetName(typeof(PartTag), Tag)} neighbours";
+    }
+
     public string UnsatisfiedMessage(string partName)
     {
         return
-            $"{partName} does not have {Enum.GetName(typeof(Requirement), Requirement)} {Enum.GetName(typeof(Locator), Locator)} {Enum.GetName(typeof(PartTag), Tag)} neighbours";
+            $"{partName} does not have {this}";
     }
 }

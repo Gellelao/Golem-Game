@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GolemCore.Extensions;
+﻿using GolemCore.Extensions;
 using GolemCore.Models.Enums;
 
 namespace GolemCore.Models;
@@ -27,5 +26,10 @@ public class Neighbourhood
                 throw new ArgumentOutOfRangeException();
         }
         return neighbours.Select(n => cache.Get(n.ToPartId())).Count(p => p.Tags.Contains(Tag));
+    }
+
+    public override string ToString()
+    {
+        return $"{Enum.GetName(typeof(Locator), Locator)} {Enum.GetName(typeof(PartTag), Tag)} neighbour";
     }
 }
