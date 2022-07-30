@@ -20,7 +20,7 @@ public class GolemGrid : Grid
         _golem = golem;
     }
 
-    protected override void UpdateSource()
+    protected override void UpdateSource(bool doValidation)
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
         var valid = true;
@@ -60,6 +60,8 @@ public class GolemGrid : Grid
                 }
             }
         }
+
+        if (!doValidation) return;
         
         foreach (var line in _golem.PartIds)
         {

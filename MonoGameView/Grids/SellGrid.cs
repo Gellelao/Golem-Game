@@ -14,7 +14,7 @@ public class SellGrid : Grid
         _shopView = shopView;
     }
 
-    protected override void UpdateSource()
+    protected override void UpdateSource(bool doValidation)
     {
         var part = Sockets[0][0].StoredPart;
         if (part == null) return;

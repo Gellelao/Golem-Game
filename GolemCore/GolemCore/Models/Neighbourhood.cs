@@ -1,0 +1,31 @@
+﻿using System.Linq;
+using GolemCore.Extensions;
+using GolemCore.Models.Enums;
+
+namespace GolemCore.Models;
+
+public class Neighbourhood
+{
+    public Locator Locator { get; init; }
+    public PartTag Tag { get; init; }
+
+    public int MatchingNeighboursCount(string fullPartId, Golem.Golem golem, PartsCache cache)
+    {
+        var neighbours = new List<string>();
+        switch (Locator)
+        {
+            case Locator.Orthogonal:
+                neighbours.AddRange(golem.GetOrthogonalNeighbourIds(fullPartId));
+                break;
+            case Locator.Diagonal:
+                throw new NotImplementedException("Haven't added a diagonal neighbour search yet");
+                break;
+            case Locator.Orthodiagonal:
+                neighbours.AddRange(golem.GetOrthodiagonalNeighbourIds(fullPartId));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        return neighbours.Select(n => cache.Get(n.ToPartId())).Count(p => p.Tags.Contains(Tag));
+    }
+}

@@ -9,6 +9,7 @@ public class Part
   public Tier Tier { get; init; }
   public PartTag[] Tags { get; init; }
   public List<Stat> Stats { get; set; }
+  public List<NeighbourhoodRequirement> Restrictions { get; set; }
   public bool[][] Shape { get; init; } =
   {
     new []{true, false, false, false},

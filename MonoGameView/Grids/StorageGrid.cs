@@ -10,7 +10,7 @@ public class StorageGrid : Grid
     {
     }
 
-    protected override void UpdateSource()
+    protected override void UpdateSource(bool doValidation)
     {
         // Storage grids shouldn't do anything when parts are added/removed
     }

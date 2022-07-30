@@ -45,7 +45,7 @@ public abstract class Grid
         }
     }
 
-    protected abstract void UpdateSource();
+    protected abstract void UpdateSource(bool doValidation);
 
     public void Update(MouseState mouseState)
     {
@@ -85,7 +85,7 @@ public abstract class Grid
                 }
             }
         }
-        UpdateSource();
+        UpdateSource(false);
     }
 
     private bool SocketClusterAtMouse(MouseState mouseState, DraggablePartCluster cluster)
@@ -99,7 +99,7 @@ public abstract class Grid
                 socket.StorePart(part);
             }
             cluster.SetPosition(clusterPosition);
-            UpdateSource();
+            UpdateSource(true);
             return true;
         }
 

@@ -1,7 +1,5 @@
 ﻿using GolemCore.Extensions;
-using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
-using GolemCore.Validation.PartRestrictions;
 
 namespace GolemCore.Validation;
 
@@ -14,28 +12,18 @@ public class PartValidator
         _partsCache = partsCache;
     }
 
-    public List<ValidationProblem> Validate(string partIdWithSuffix, Golem golem)
+    public List<ValidationProblem> Validate(string fullPartId, Golem golem)
     {
         var problems = new List<ValidationProblem>();
-        var part = _partsCache.Get(partIdWithSuffix.ToPartId());
-        var tags = part.Tags;
-        if (tags == null) return problems;
-        foreach (var tag in tags)
+        var part = _partsCache.Get(fullPartId.ToPartId());
+        foreach (var restriction in part.Restrictions)
         {
-            var restriction = GetRestrictions(tag);
-            problems.AddRange(restriction.GetProblems(partIdWithSuffix, golem));
+            if (!restriction.Satisfied(fullPartId, golem, _partsCache))
+            {
+                problems.Add(new ValidationProblem(restriction.UnsatisfiedMessage(part.Name)));
+            }
         }
 
         return problems;
-    }
-    
-    private PartRestriction GetRestrictions(PartTag tag)
-    {
-        return tag switch
-        {
-            PartTag.Grabby => new NoRestriction(_partsCache),
-            PartTag.Orb => new OrbRestriction(_partsCache),
-            _ => throw new ArgumentOutOfRangeException(nameof(tag), tag, null)
-        };
     }
 }

@@ -3,5 +3,6 @@
 public enum PartTag
 {
   Grabby,
-  Orb
+  Fire,
+  Mossy
 }
