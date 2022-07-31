@@ -130,6 +130,37 @@ var newParts = new List<Part>
             new[] {false, false, false, false},
             new[] {false, false, false, false}
         }
+    },
+    new()
+    {
+        Id = 5,
+        Name = "Rain Dish",
+        Tier = Tier.Common,
+        Tags = new List<PartTag>(),
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Water
+            },
+        },
+        Shape = new[]
+        {
+            new[] {true, true, false, false},
+            new[] {false, true, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        },
+        Restrictions = new List<NeighbourhoodRequirement>
+        {
+            new()
+            {
+                Locator = Locator.AllNorthernParts,
+                Requirement = Requirement.Zero,
+                Tag = PartTag.NotNull
+            }
+        }
     }
 };
 

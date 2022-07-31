@@ -81,4 +81,26 @@ public static class GolemExtensions
 
         return neighbours;
     }
+    
+    public static List<string> GetPartsNorthOf(this Golem golem, string fullPartId)
+    {
+        var neighbours = new List<string>();
+        var ids = golem.PartIds;
+        for (var y = 0; y < ids.Length; y++)
+        {
+            for (var x = 0; x < ids[y].Length; x++)
+            {
+                if (ids[y][x] != fullPartId) continue;
+                for (var i = y; i >= 0; i--)
+                {
+                    if (ids[i][x] != "-1" && ids[i][x] != fullPartId)
+                    {
+                        neighbours.Add(ids[i][x]);
+                    }
+                }
+            }
+        }
+
+        return neighbours;
+    }
 }

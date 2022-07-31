@@ -22,8 +22,16 @@ public class Neighbourhood
             case Locator.Orthodiagonal:
                 neighbours.AddRange(golem.GetOrthodiagonalNeighbourIds(fullPartId));
                 break;
+            case Locator.AllNorthernParts:
+                neighbours.AddRange(golem.GetPartsNorthOf(fullPartId));
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+
+        if (Tag == PartTag.NotNull)
+        {
+            return neighbours.Count;
         }
         return neighbours.Select(n => cache.Get(n.ToPartId())).Count(p => p.Tags.Contains(Tag));
     }

@@ -4,5 +4,6 @@ public enum StatType
 {
   Health,
   Attack,
-  Speed
+  Speed,
+  Water
 }

@@ -4,5 +4,6 @@ public enum Locator
 {
     Orthogonal,
     Diagonal,
-    Orthodiagonal
+    Orthodiagonal,
+    AllNorthernParts
 }
