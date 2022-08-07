@@ -1,6 +1,7 @@
 ﻿using GolemCore.Models;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Part;
+using GolemCore.Models.Triggers;
 using static Utils.PartsManager;
 
 Console.WriteLine("Hello, World!");
@@ -142,7 +143,13 @@ var newParts = new List<Part>
             new()
             {
                 Modifier = 3,
-                Type = StatType.Water
+                Type = StatType.Water,
+                Condition = new NeighbourhoodRequirement
+                {
+                    Locator = Locator.AllNorthernParts,
+                    Requirement = Requirement.Zero,
+                    Tag = PartTag.NotNull
+                }
             },
         },
         Shape = new[]
@@ -151,20 +158,34 @@ var newParts = new List<Part>
             new[] {false, true, false, false},
             new[] {false, false, false, false},
             new[] {false, false, false, false}
-        },
-        Restrictions = new List<NeighbourhoodRequirement>
+        }
+    },
+    new()
+    {
+        Id = 6,
+        Name = "Quartz Crystal",
+        Tier = Tier.Common,
+        Tags = new List<PartTag>(),
+        Stats = new List<Stat>(),
+        Shape = new[]
         {
-            new()
+            new[] {true, false, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        },
+        Triggers = new List<Trigger>
+        {
+            new TurnTrigger
             {
-                Locator = Locator.AllNorthernParts,
-                Requirement = Requirement.Zero,
-                Tag = PartTag.NotNull
+                Frequency = 2,
+                StartingTurn = 2
             }
         }
     }
 };
 
-await PostAllParts(newParts);
+//await PostAllParts(newParts);
 
 await WritePartsFromDatabaseIntoFile("test.json");
 

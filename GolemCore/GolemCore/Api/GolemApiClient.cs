@@ -4,7 +4,7 @@ using GolemCore.Models;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
 
-namespace GolemCore;
+namespace GolemCore.Api;
 
 public class GolemApiClient : IGolemApiClient
 {
@@ -15,7 +15,9 @@ public class GolemApiClient : IGolemApiClient
     {
         _httpClient = httpClient;
 
-        Options = new JsonSerializerOptions(new JsonSerializerOptions{PropertyNamingPolicy = null});
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new TriggerConverter());
+        Options = options;
     }
 
     public async Task<List<Golem>> GetGolemSelection(CancellationToken cancellationToken)
@@ -52,7 +54,7 @@ public class GolemApiClient : IGolemApiClient
 
     public async Task<List<Part>> GetParts(CancellationToken cancellationToken)
     {
-        var parts = await _httpClient.GetFromJsonAsync<PartFetchResponse>(Constants.GetPartEndpoint, cancellationToken);
+        var parts = await _httpClient.GetFromJsonAsync<PartFetchResponse>(Constants.GetPartEndpoint, Options, cancellationToken);
 
         if (parts is null or { Items.Count: 0 } or { Count: 0 })
         {

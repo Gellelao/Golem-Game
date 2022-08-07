@@ -2,7 +2,7 @@
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
 
-namespace GolemCore;
+namespace GolemCore.Api;
 
 public interface IGolemApiClient
 {

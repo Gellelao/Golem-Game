@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
-using GolemCore;
-using GolemCore.Models;
+using GolemCore.Api;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
 
@@ -13,8 +12,10 @@ public static class PartsManager
     var client = (GolemApiClient)GolemApiClientFactory.Create();
     var parts = await client.GetParts(new CancellationToken());
 
-    var options = client.Options;
-    options.WriteIndented = true;
+    var options = new JsonSerializerOptions(client.Options)
+    {
+      WriteIndented = true
+    };
 
     await using var fileStream = File.Create(fileName);
     await JsonSerializer.SerializeAsync(fileStream, parts, options);

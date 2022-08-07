@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GolemCore;
+using GolemCore.Api;
 using GolemCore.Models.Golem;
 using GolemCore.Validation;
 using Microsoft.Xna.Framework;

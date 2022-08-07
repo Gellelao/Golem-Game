@@ -1,4 +1,4 @@
-﻿namespace GolemCore;
+﻿namespace GolemCore.Api;
 
 public static class GolemApiClientFactory
 {
