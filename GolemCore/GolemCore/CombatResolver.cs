@@ -22,16 +22,21 @@ public class CombatResolver
 
     while (userHealth > 0 && opponentHealth > 0)
     {
+      turnCounter++; // this makes the first turn "turn 1" instead of zero
+      var turnStatus = new TurnStatus(turnCounter);
       opponentHealth -= userAttack;
       results.Add($"You do {userAttack} damage to opponent, who is now at {opponentHealth} HP");
       userHealth -= opponentAttack;
       results.Add($"They do {opponentAttack} damage to you, leaving you at {userHealth} HP");
-      turnCounter++;
+      var userTriggersTriggered = user.NonEmptyIdList.Select(id => partsCache.Get(int.Parse(id)))
+        .Where(part => part.Triggers.Any(t => t.Triggered(turnStatus)));
+      results.AddRange(userTriggersTriggered.Select(part => $"{part.Name} triggered!"));
       if (turnCounter >= Constants.TurnLimit)
       {
         results.Add($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
         break;
       }
+      results.Add($"--------------turn {turnCounter} over");
     }
 
     return results;

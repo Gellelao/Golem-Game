@@ -81,6 +81,8 @@ public class ShopView
 
     public void Reroll()
     {
+        // Adjust this to make rerolling cost more
+        if (_shop.PlayerFunds <= 0) return;
         _shop.SetPartsForRound();
         GenerateShopParts();
     }

@@ -18,9 +18,9 @@ public class Golem
         new []{"-1","-1","-1","-1"}
     };
 
-    public List<string> IdList
+    public List<string> NonEmptyIdList
     {
-        get { return PartIds.SelectMany(p => p).ToList(); }
+        get { return PartIds.SelectMany(p => p).Where(id => id != "-1").ToList(); }
     }
 
     public override string ToString()
