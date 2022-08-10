@@ -9,4 +9,10 @@ public class TurnTrigger : Trigger
         var turnCounter = turnStatus.TurnCounter;
         return turnCounter == StartingTurn || (turnCounter - StartingTurn) % Frequency == 0;
     }
+
+    public override string ToString()
+    {
+        var tags = EffectTags.Any() ? $"{string.Join(" or ", EffectTags)} " : "";
+        return $"Triggers {EffectRange.ToString()} {tags}parts every {Frequency} turns, starting turn {StartingTurn}";
+    }
 }

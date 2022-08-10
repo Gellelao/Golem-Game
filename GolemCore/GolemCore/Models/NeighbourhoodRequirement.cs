@@ -1,4 +1,5 @@
-﻿using GolemCore.Models.Enums;
+﻿using GolemCore.Extensions;
+using GolemCore.Models.Enums;
 
 namespace GolemCore.Models;
 
@@ -31,7 +32,7 @@ public class NeighbourhoodRequirement : Neighbourhood
     public override string ToString()
     {
         return
-            $"{Enum.GetName(typeof(Requirement), Requirement)} {Enum.GetName(typeof(Locator), Locator)} {Enum.GetName(typeof(PartTag), Tag)} neighbours";
+            $"{Requirement.ToString()} {Locator.ToString()} {Tag.ToString()} neighbours";
     }
 
     public string UnsatisfiedMessage(string partName)

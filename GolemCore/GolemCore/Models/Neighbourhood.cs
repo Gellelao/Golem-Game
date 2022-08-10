@@ -38,6 +38,6 @@ public class Neighbourhood
 
     public override string ToString()
     {
-        return $"{Enum.GetName(typeof(Locator), Locator)} {Enum.GetName(typeof(PartTag), Tag)} neighbour";
+        return $"{Locator.ToString()} {Tag.ToString()} neighbours";
     }
 }

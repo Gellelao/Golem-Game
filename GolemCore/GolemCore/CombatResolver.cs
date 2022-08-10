@@ -31,6 +31,7 @@ public class CombatResolver
       var userTriggersTriggered = user.NonEmptyIdList.Select(id => partsCache.Get(int.Parse(id)))
         .Where(part => part.Triggers.Any(t => t.Triggered(turnStatus)));
       results.AddRange(userTriggersTriggered.Select(part => $"{part.Name} triggered!"));
+      
       if (turnCounter >= Constants.TurnLimit)
       {
         results.Add($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
