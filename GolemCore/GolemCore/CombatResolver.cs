@@ -28,7 +28,7 @@ public class CombatResolver
       results.Add($"You do {userAttack} damage to opponent, who is now at {opponentHealth} HP");
       userHealth -= opponentAttack;
       results.Add($"They do {opponentAttack} damage to you, leaving you at {userHealth} HP");
-      var userTriggersTriggered = user.NonEmptyIdList.Select(id => partsCache.Get(int.Parse(id)))
+      var userTriggersTriggered = user.NonEmptyIdList.Select(id => partsCache.Get(id.ToPartId()))
         .Where(part => part.Triggers.Any(t => t.Triggered(turnStatus)));
       results.AddRange(userTriggersTriggered.Select(part => $"{part.Name} triggered!"));
       
