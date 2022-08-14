@@ -9,4 +9,9 @@ public abstract class Trigger
     public List<PartTag> EffectTags { get; set; } = new ();
     public abstract bool Triggered(TurnStatus turnStatus);
     public abstract override string ToString();
+
+    public bool WouldActivate(Part.Part part)
+    {
+        return part.Tags.Intersect(EffectTags).Any();
+    }
 }
