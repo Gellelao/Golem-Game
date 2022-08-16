@@ -1,4 +1,5 @@
 ﻿using GolemCore.Models;
+using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Part;
 using GolemCore.Models.Triggers;
@@ -182,10 +183,34 @@ var newParts = new List<Part>
                 StartingTurn = 2
             }
         }
+    },
+    new()
+    {
+        Id = 7,
+        Name = "Gargoyle Head",
+        Tier = Tier.Common,
+        Tags = new List<PartTag>(),
+        Stats = new List<Stat>(),
+        Shape = new[]
+        {
+            new[] {true, true, false, false},
+            new[] {true, true, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        },
+        Effects = new List<Effect>
+        {
+            new StatChangeEffect()
+            {
+                Target = Target.Opponent,
+                Stat = StatType.Health,
+                Delta = -5
+            }
+        }
     }
 };
 
-//await PostAllParts(newParts);
+await PostAllParts(newParts);
 
 await WritePartsFromDatabaseIntoFile("test.json");
 

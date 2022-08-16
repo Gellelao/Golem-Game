@@ -148,10 +148,9 @@ public class Golem
                 var neighbouringPartIds = trigger.EffectRange.IdsOfNeighbouringParts(partId, this);
                 var neighbouringParts = neighbouringPartIds.Select(id => partsCache.Get(id.ToPartId()));
                 var eligibleParts = neighbouringParts.Where(np => trigger.WouldActivate(np));
-                activatedParts.AddRange(eligibleParts); // Filter to to just those that have any Effects on them
+                activatedParts.AddRange(eligibleParts.Where(p => p.Effects.Any()));
             }
         }
-        // Cut any duplicates from activatedParts
-        return activatedParts;
+        return activatedParts.Distinct().ToList();
     }
 }

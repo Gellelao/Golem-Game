@@ -1,8 +1,10 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using GolemCore.Models;
+using GolemCore.Models.Effects;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
+using GolemCore.Models.Triggers;
 
 namespace GolemCore.Api;
 
@@ -17,6 +19,7 @@ public class GolemApiClient : IGolemApiClient
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(new TriggerConverter());
+        options.Converters.Add(new EffectConverter());
         Options = options;
     }
 

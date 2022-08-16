@@ -12,6 +12,7 @@ public abstract class Trigger
 
     public bool WouldActivate(Part.Part part)
     {
+        if (!EffectTags.Any()) return true;
         return part.Tags.Intersect(EffectTags).Any();
     }
 }

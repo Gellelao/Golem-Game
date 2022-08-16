@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Triggers;
 
@@ -13,6 +14,7 @@ public class Part
   public List<Stat> Stats { get; init; } = new();
   public List<NeighbourhoodRequirement> Restrictions { get; init; } = new();
   public List<Trigger> Triggers { get; init; } = new();
+  public List<Effect> Effects { get; init; } = new();
   public bool[][] Shape { get; init; } =
   {
     new []{true, false, false, false},

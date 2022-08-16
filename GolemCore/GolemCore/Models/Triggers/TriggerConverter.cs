@@ -1,8 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using GolemCore.Models.Triggers;
 
-namespace GolemCore.Api;
+namespace GolemCore.Models.Triggers;
 
 public class TriggerConverter : JsonConverter<Trigger>
 {

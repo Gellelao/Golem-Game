@@ -29,7 +29,11 @@ public class CombatResolver
       userHealth -= opponentAttack;
       results.Add($"They do {opponentAttack} damage to you, leaving you at {userHealth} HP");
 
-      var userActivatedParts = user.GetActivatedParts(partsCache);
+      var userActivatedParts = user.GetActivatedParts(turnStatus, partsCache);
+      foreach (var part in userActivatedParts)
+      {
+        results.Add($"{part.Name} activated!");
+      }
       
       if (turnCounter >= Constants.TurnLimit)
       {
