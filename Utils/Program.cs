@@ -207,6 +207,30 @@ var newParts = new List<Part>
                 Delta = -5
             }
         }
+    },
+    new()
+    {
+        Id = 8,
+        Name = "Gargoyle Head",
+        Tier = Tier.Common,
+        Tags = new List<PartTag>(),
+        Stats = new List<Stat>(),
+        Shape = new[]
+        {
+            new[] {true, true, false, false},
+            new[] {true, true, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
+        },
+        Effects = new List<Effect>
+        {
+            new StatChangeEffect()
+            {
+                Target = Target.Opponent,
+                Stat = StatType.Health,
+                Delta = -5
+            }
+        }
     }
 };
 
