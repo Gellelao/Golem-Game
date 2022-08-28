@@ -1,4 +1,5 @@
-﻿using GolemCore.Models;
+﻿using GolemCore;
+using GolemCore.Models;
 using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Part;
@@ -28,13 +29,7 @@ var newParts = new List<Part>
                 Type = StatType.Health
             }
         },
-        Shape = new[]
-        {
-            new[] {true, true, false, false},
-            new[] {true, true, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
-        }
+        Shape = CommonPartProperties.TwoByTwoTileShape
     },
     new()
     {
@@ -124,13 +119,6 @@ var newParts = new List<Part>
                 Modifier = 1,
                 Type = StatType.Health
             },
-        },
-        Shape = new[]
-        {
-            new[] {true, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
         }
     },
     new()
@@ -168,13 +156,6 @@ var newParts = new List<Part>
         Tier = Tier.Common,
         Tags = new List<PartTag>(),
         Stats = new List<Stat>(),
-        Shape = new[]
-        {
-            new[] {true, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
-        },
         Triggers = new List<Trigger>
         {
             new TurnTrigger
@@ -191,44 +172,22 @@ var newParts = new List<Part>
         Tier = Tier.Common,
         Tags = new List<PartTag>(),
         Stats = new List<Stat>(),
-        Shape = new[]
-        {
-            new[] {true, true, false, false},
-            new[] {true, true, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
-        },
+        Shape = CommonPartProperties.TwoByTwoTileShape,
         Effects = new List<Effect>
         {
-            new StatChangeEffect()
+            new StatChangeEffect
             {
+                Requirement = CommonPartProperties.GreaterThanZeroWater,
                 Target = Target.Opponent,
                 Stat = StatType.Health,
                 Delta = -5
-            }
-        }
-    },
-    new()
-    {
-        Id = 8,
-        Name = "Gargoyle Head",
-        Tier = Tier.Common,
-        Tags = new List<PartTag>(),
-        Stats = new List<Stat>(),
-        Shape = new[]
-        {
-            new[] {true, true, false, false},
-            new[] {true, true, false, false},
-            new[] {false, false, false, false},
-            new[] {false, false, false, false}
-        },
-        Effects = new List<Effect>
-        {
-            new StatChangeEffect()
+            },
+            new StatChangeEffect
             {
-                Target = Target.Opponent,
-                Stat = StatType.Health,
-                Delta = -5
+                Requirement = CommonPartProperties.GreaterThanZeroWater,
+                Target = Target.Self,
+                Stat = StatType.Water,
+                Delta = -1
             }
         }
     }

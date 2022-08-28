@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Api;
 using GolemCore.Models.Golem;
+using GolemCore.Resolver;
 using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
