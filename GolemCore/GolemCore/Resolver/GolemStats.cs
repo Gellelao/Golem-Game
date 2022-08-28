@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using GolemCore.Extensions;
+using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 
@@ -10,12 +11,14 @@ public class GolemStats
     private readonly Golem _golem;
     private readonly PartsCache _cache;
     private readonly Dictionary<StatType, int> _currentStats;
+    private readonly Dictionary<Effect, int> _effectTriggerCounts;
 
     public GolemStats(Golem golem, PartsCache partsCache)
     {
         _golem = golem;
         _cache = partsCache;
         _currentStats = new Dictionary<StatType, int>();
+        _effectTriggerCounts = new Dictionary<Effect, int>();
         CalculateStats();
     }
 
@@ -58,6 +61,23 @@ public class GolemStats
     public void Reduce(StatType stat, int amount)
     {
         Update(stat, amount * -1);
+    }
+    
+    public int GetTriggerCount(Effect effect)
+    {
+        return !_effectTriggerCounts.ContainsKey(effect) ? 0 : _effectTriggerCounts[effect];
+    }
+
+    public void IncrementEffectCount(Effect effect)
+    {
+        if (_effectTriggerCounts.ContainsKey(effect))
+        {
+            _effectTriggerCounts[effect]++;
+        }
+        else
+        {
+            _effectTriggerCounts.Add(effect, 1);
+        }
     }
 
     public override string ToString()

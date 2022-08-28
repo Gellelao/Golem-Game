@@ -27,4 +27,10 @@ public abstract class Effect
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+
+    public bool HasChargesLeft(int timesTriggeredSoFar)
+    {
+        if (Charges == 0) return true;
+        return Charges - timesTriggeredSoFar > 0;
+    }
 }

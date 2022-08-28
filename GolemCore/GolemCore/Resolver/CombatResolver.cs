@@ -39,6 +39,15 @@ public class CombatResolver
             results.Add($"{part.Name} effect requirement is not met");
             break;
           }
+
+          if (!effect.HasChargesLeft(userStats.GetTriggerCount(effect)))
+          {
+            results.Add($"{part.Name} effect has no charges remaining");
+            break;
+          }
+          
+          userStats.IncrementEffectCount(effect);
+          
           switch (effect)
           {
             case StatChangeEffect statChangeEffect:
