@@ -2,6 +2,7 @@
 using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
+using GolemCore.Models.Part;
 
 namespace GolemCore.Resolver;
 
@@ -34,52 +35,15 @@ public class CombatResolver
     while (_userStats.Get(StatType.Health) > 0 && _opponentStats.Get(StatType.Health) > 0)
     {
       turnCounter++; // this makes the first turn "turn 1" instead of zero
-      var turnStatus = new TurnStatus(turnCounter);
       
-      _opponentStats.Reduce(StatType.Health, _userStats.Get(StatType.Attack));
+      UpdateGolemStats(Target.Opponent, StatType.Health, _userStats.Get(StatType.Attack));
       _results.Add($"You do {_userStats.Get(StatType.Attack)} damage to opponent, who is now at {_opponentStats.Get(StatType.Health)} HP");
       
-      _userStats.Reduce(StatType.Health, _opponentStats.Get(StatType.Attack));
+      UpdateGolemStats(Target.Self, StatType.Health, _opponentStats.Get(StatType.Attack));
       _results.Add($"They do {_opponentStats.Get(StatType.Attack)} damage to you, leaving you at {_userStats.Get(StatType.Health)} HP");
 
-      var userActivatedParts = _user.GetActivatedParts(turnStatus, _cache);
-      foreach (var part in userActivatedParts)
-      {
-        _results.Add($"{part.Name} activated!");
-        foreach (var effect in part.Effects)
-        {
-          if (!effect.RequirementMet(_userStats, _opponentStats))
-          {
-            _results.Add($"{part.Name} effect requirement is not met");
-            break;
-          }
-
-          if (!effect.HasChargesLeft(_userStats.GetTriggerCount(effect)))
-          {
-            _results.Add($"{part.Name} effect has no charges remaining");
-            break;
-          }
-          
-          _userStats.IncrementEffectCount(effect);
-          
-          switch (effect)
-          {
-            case StatChangeEffect statChangeEffect:
-              if (statChangeEffect.Target == Target.Opponent)
-              {
-                _opponentStats.Update(statChangeEffect.Stat, statChangeEffect.Delta);
-                _results.Add($"{part.Name} effect has changed opponent {statChangeEffect.Stat} by {statChangeEffect.Delta}! Now at {_opponentStats.Get(StatType.Health)}");
-              }
-              else
-              {
-                _userStats.Update(statChangeEffect.Stat, statChangeEffect.Delta);
-                _results.Add($"{part.Name} effect has changed user {statChangeEffect.Stat} by {statChangeEffect.Delta}! Now at {_userStats.Get(StatType.Health)}");
-              }
-
-              break;
-          }
-        }
-      }
+      ProcessTurnTriggers(_user, _userStats, turnCounter);
+      ProcessTurnTriggers(_opponent, _opponentStats, turnCounter);
       
       if (turnCounter >= Constants.TurnLimit)
       {
@@ -90,6 +54,65 @@ public class CombatResolver
     }
 
     return _results;
+  }
+
+  private void ProcessTurnTriggers(Golem golem, GolemStats golemStats, int turnNumber)
+  {
+    var userActivatedParts = golem.GetPartsActivatedByTurn(turnNumber, _cache);
+    ProcessEffects(golemStats, userActivatedParts);
+  }
+  
+  private void ProcessStatChangeTriggers(Golem golem, GolemStats golemStats, Target target, StatType statType, int delta)
+  {
+    var userActivatedParts = golem.GetPartsActivatedByStatChange(target, statType, delta, _cache);
+    ProcessEffects(golemStats, userActivatedParts);
+  }
+
+  private void ProcessEffects(GolemStats golemStats, List<Part> activatedParts)
+  {
+    foreach (var part in activatedParts)
+    {
+      _results.Add($"{part.Name} activated!");
+      foreach (var effect in part.Effects)
+      {
+        if (!effect.RequirementMet(_userStats, _opponentStats))
+        {
+          _results.Add($"{part.Name} effect requirement is not met");
+          break;
+        }
+
+        if (!effect.HasChargesLeft(golemStats.GetTriggerCount(effect)))
+        {
+          _results.Add($"{part.Name} effect has no charges remaining");
+          break;
+        }
+
+        golemStats.IncrementEffectCount(effect);
+
+        switch (effect)
+        {
+          case StatChangeEffect statChangeEffect:
+            UpdateGolemStats(statChangeEffect.Target, statChangeEffect.Stat, statChangeEffect.Delta);
+            break;
+        }
+      }
+    }
+  }
+
+  private void UpdateGolemStats(Target target, StatType stat, int delta)
+  {
+    if (target == Target.Opponent)
+    {
+      _opponentStats.Update(stat, delta);
+      _results.Add($"Effect has changed opponent {stat} by {delta}! Now at {_opponentStats.Get(StatType.Health)}");
+    }
+    else
+    {
+      _userStats.Update(stat, delta);
+      _results.Add($"Effect has changed user {stat} by {delta}! Now at {_userStats.Get(StatType.Health)}");
+    }
+    ProcessStatChangeTriggers(_user, _userStats, target, stat, delta);
+    ProcessStatChangeTriggers(_opponent, _opponentStats, target, stat, delta);
   }
 }
 

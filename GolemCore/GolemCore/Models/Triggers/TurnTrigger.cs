@@ -6,10 +6,10 @@ public class TurnTrigger : Trigger
 {
     public int Frequency { get; set; }
     public int StartingTurn { get; set; }
-    public override bool Triggered(TurnStatus turnStatus)
+    
+    public bool Triggered(int turnNumber)
     {
-        var turnCounter = turnStatus.TurnCounter;
-        return turnCounter == StartingTurn || (turnCounter - StartingTurn) % Frequency == 0;
+        return turnNumber == StartingTurn || (turnNumber - StartingTurn) % Frequency == 0;
     }
 
     public override string ToString()

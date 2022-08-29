@@ -10,6 +10,9 @@ public static class LocatorExtensions
         var neighbours = new List<string>();
         switch (locator)
         {
+            case Locator.Self:
+                neighbours.Add(fullPartId);
+                break;
             case Locator.Orthogonal:
                 neighbours.AddRange(golem.GetOrthogonalNeighbourIds(fullPartId));
                 break;

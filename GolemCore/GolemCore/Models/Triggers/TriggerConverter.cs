@@ -11,6 +11,7 @@ public class TriggerConverter : JsonConverter<Trigger>
     private enum TypeDiscriminator
     {
         TurnTrigger = 1,
+        StatChangeTrigger = 2
     }
     
     public override bool CanConvert(Type typeToConvert) => typeof(Trigger).IsAssignableFrom(typeToConvert);
@@ -38,6 +39,11 @@ public class TriggerConverter : JsonConverter<Trigger>
                 if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)throw new JsonException();
                 trigger = (TurnTrigger)JsonSerializer.Deserialize(ref reader, typeof(TurnTrigger))!;
                 break;
+            case TypeDiscriminator.StatChangeTrigger:
+                if (!reader.Read() || reader.GetString() != "TypeValue") throw new JsonException();
+                if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)throw new JsonException();
+                trigger = (StatChangeTrigger)JsonSerializer.Deserialize(ref reader, typeof(StatChangeTrigger))!;
+                break;
             default:
                 throw new NotSupportedException();
         }
@@ -54,11 +60,18 @@ public class TriggerConverter : JsonConverter<Trigger>
     {
         writer.WriteStartObject();
 
-        if (trigger is TurnTrigger turnTrigger)
+        switch (trigger)
         {
-            writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.TurnTrigger);
-            writer.WritePropertyName("TypeValue");
-            JsonSerializer.Serialize(writer, turnTrigger);
+            case TurnTrigger turnTrigger:
+                writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.TurnTrigger);
+                writer.WritePropertyName("TypeValue");
+                JsonSerializer.Serialize(writer, turnTrigger);
+                break;
+            case StatChangeTrigger statChangeTrigger:
+                writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.StatChangeTrigger);
+                writer.WritePropertyName("TypeValue");
+                JsonSerializer.Serialize(writer, statChangeTrigger);
+                break;
         }
 
         writer.WriteEndObject();

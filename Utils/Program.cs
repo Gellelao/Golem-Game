@@ -190,6 +190,41 @@ var newParts = new List<Part>
                 Delta = -1
             }
         }
+    },
+    new()
+    {
+        Id = 8,
+        Name = "Bramble Shell",
+        Tier = Tier.Common,
+        Tags = new List<PartTag>(),
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Type = StatType.Health,
+                Modifier = 2
+            }
+        },
+        Triggers = new List<Trigger>
+        {
+            new StatChangeTrigger
+            {
+                Target = Target.Self,
+                Stat = StatType.Health,
+                DeltaType = DeltaType.Decrease,
+                EffectRange = Locator.Self
+            }
+        },
+        Effects = new List<Effect>
+        {
+            new StatChangeEffect
+            {
+                Target = Target.Self,
+                Stat = StatType.Health,
+                Delta = 1,
+                Charges = 3
+            },
+        }
     }
 };
 

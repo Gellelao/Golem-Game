@@ -2,6 +2,7 @@
 
 public enum Locator
 {
+    Self,
     Orthogonal,
     Diagonal,
     Orthodiagonal,

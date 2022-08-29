@@ -8,25 +8,20 @@ public class StatChangeTrigger : Trigger
     public Target Target { get; init; }
     public StatType Stat { get; init; }
     public DeltaType DeltaType { get; init; }
-    public int Threshold { get; set; }
+    public int Threshold { get; init; }
     
-    public override bool Triggered(TurnStatus turnStatus)
+    public bool Triggered(Target target, StatType statType, int delta)
     {
-        var statChanges = turnStatus.UserStatChanges;
-        if (Target == Target.Opponent)
-        {
-            statChanges = turnStatus.OpponentStatChanges;
-        }
-
-        if (!statChanges.ContainsKey(Stat)) return false;
-
-        var difference = statChanges[Stat];
+        if (Target != target) return false;
+        if (Stat != statType) return false;
+        if (Math.Abs(delta) <= Threshold) return false;
+        
         switch (DeltaType)
         {
             case DeltaType.Increase:
-                return difference
+                return delta > 0;
             case DeltaType.Decrease:
-                break;
+                return delta < 0;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -34,6 +29,6 @@ public class StatChangeTrigger : Trigger
 
     public override string ToString()
     {
-        throw new NotImplementedException();
+        return "TEST";
     }
 }

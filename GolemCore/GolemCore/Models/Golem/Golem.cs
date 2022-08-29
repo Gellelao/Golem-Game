@@ -2,6 +2,7 @@
 using System.Text;
 using GolemCore.Extensions;
 using GolemCore.Models.Enums;
+using GolemCore.Models.Triggers;
 using GolemCore.Resolver;
 
 namespace GolemCore.Models.Golem;
@@ -137,7 +138,7 @@ public class Golem
         return neighbours;
     }
     
-    public List<Part.Part> GetActivatedParts(TurnStatus turnStatus, PartsCache partsCache)
+    public List<Part.Part> GetPartsActivatedByTurn(int turnNumber, PartsCache partsCache)
     {
         var activatedParts = new List<Part.Part>();
         foreach (var partId in NonEmptyIdList)
@@ -145,13 +146,35 @@ public class Golem
             var part = partsCache.Get(partId.ToPartId());
             foreach (var trigger in part.Triggers)
             {
-                if (!trigger.Triggered(turnStatus)) continue;
-                var neighbouringPartIds = trigger.EffectRange.IdsOfNeighbouringParts(partId, this);
-                var neighbouringParts = neighbouringPartIds.Select(id => partsCache.Get(id.ToPartId()));
-                var eligibleParts = neighbouringParts.Where(np => trigger.WouldActivate(np));
-                activatedParts.AddRange(eligibleParts.Where(p => p.Effects.Any()));
+                if (trigger is not TurnTrigger turnTrigger) continue;
+                if (!turnTrigger.Triggered(turnNumber)) continue;
+                activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
             }
         }
         return activatedParts.Distinct().ToList();
+    }
+
+    public List<Part.Part> GetPartsActivatedByStatChange(Target target, StatType statType, int delta, PartsCache partsCache)
+    {
+        var activatedParts = new List<Part.Part>();
+        foreach (var partId in NonEmptyIdList)
+        {
+            var part = partsCache.Get(partId.ToPartId());
+            foreach (var trigger in part.Triggers)
+            {
+                if (trigger is not StatChangeTrigger statTrigger) continue;
+                if (!statTrigger.Triggered(target, statType, delta)) continue;
+                activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
+            }
+        }
+        return activatedParts.Distinct().ToList();
+    }
+
+    private List<Part.Part> GetActivatedParts(Trigger trigger, string partId, PartsCache cache)
+    {
+        var neighbouringPartIds = trigger.EffectRange.IdsOfNeighbouringParts(partId, this);
+        var neighbouringParts = neighbouringPartIds.Select(id => cache.Get(id.ToPartId()));
+        var eligibleParts = neighbouringParts.Where(trigger.WouldActivate);
+        return eligibleParts.Where(p => p.Effects.Any()).ToList();
     }
 }
