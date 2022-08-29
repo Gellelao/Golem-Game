@@ -157,7 +157,8 @@ namespace MonoGameView
         private void OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
         {
             if (!GolemGridsAreValid()) return;
-            var results = CombatResolver.GetOutcome(golem1, golem2, cache);
+            var resolver = new CombatResolver(golem1, golem2, cache);
+            var results = resolver.GetOutcome();
 
             _resultProjector.SetResults(results);
             

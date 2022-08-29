@@ -1,4 +1,5 @@
 ﻿using GolemCore.Models.Enums;
+using GolemCore.Resolver;
 
 namespace GolemCore.Models.Triggers;
 

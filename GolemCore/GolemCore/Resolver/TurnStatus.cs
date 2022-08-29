@@ -1,6 +1,6 @@
 ﻿using GolemCore.Models.Enums;
 
-namespace GolemCore.Models;
+namespace GolemCore.Resolver;
 
 public class TurnStatus
 {
@@ -11,4 +11,6 @@ public class TurnStatus
     {
         TurnCounter = turnCounter;
     }
+    
+    
 }

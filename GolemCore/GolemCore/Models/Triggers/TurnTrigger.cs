@@ -1,4 +1,6 @@
-﻿namespace GolemCore.Models.Triggers;
+﻿using GolemCore.Resolver;
+
+namespace GolemCore.Models.Triggers;
 
 public class TurnTrigger : Trigger
 {

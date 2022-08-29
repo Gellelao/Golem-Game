@@ -8,6 +8,8 @@ namespace GolemCore.Resolver;
 
 public class GolemStats
 {
+    public event EventHandler<StatChangeArgs> StatChanged;
+    
     private readonly Golem _golem;
     private readonly PartsCache _cache;
     private readonly Dictionary<StatType, int> _currentStats;
@@ -56,6 +58,7 @@ public class GolemStats
     public void Update(StatType stat, int amount)
     {
         _currentStats[stat] += amount;
+        StatChanged.Invoke(this, new StatChangeArgs(stat, amount));
     }
 
     public void Reduce(StatType stat, int amount)
