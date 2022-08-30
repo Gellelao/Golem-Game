@@ -36,11 +36,11 @@ public class CombatResolver
     {
       turnCounter++; // this makes the first turn "turn 1" instead of zero
       
-      UpdateGolemStats(Target.Opponent, StatType.Health, _userStats.Get(StatType.Attack));
-      _results.Add($"You do {_userStats.Get(StatType.Attack)} damage to opponent, who is now at {_opponentStats.Get(StatType.Health)} HP");
+      _results.Add($"You do {_userStats.Get(StatType.Attack)} damage to opponent");
+      UpdateGolemStats(Target.Opponent, StatType.Health, _userStats.Get(StatType.Attack) * -1);
       
-      UpdateGolemStats(Target.Self, StatType.Health, _opponentStats.Get(StatType.Attack));
-      _results.Add($"They do {_opponentStats.Get(StatType.Attack)} damage to you, leaving you at {_userStats.Get(StatType.Health)} HP");
+      _results.Add($"They do {_opponentStats.Get(StatType.Attack)} damage to you");
+      UpdateGolemStats(Target.Self, StatType.Health, _opponentStats.Get(StatType.Attack) * -1);
 
       ProcessTurnTriggers(_user, _userStats, turnCounter);
       ProcessTurnTriggers(_opponent, _opponentStats, turnCounter);
@@ -93,6 +93,7 @@ public class CombatResolver
         {
           case StatChangeEffect statChangeEffect:
             UpdateGolemStats(statChangeEffect.Target, statChangeEffect.Stat, statChangeEffect.Delta);
+            _results.Add($"Effect has changed {statChangeEffect.Target} {statChangeEffect.Stat} by {statChangeEffect.Delta}! Now at {(statChangeEffect.Target == Target.Opponent ? _opponentStats.Get(StatType.Health) : _userStats.Get(StatType.Health))}");
             break;
         }
       }
@@ -103,13 +104,11 @@ public class CombatResolver
   {
     if (target == Target.Opponent)
     {
-      _opponentStats.Update(stat, delta);
-      _results.Add($"Effect has changed opponent {stat} by {delta}! Now at {_opponentStats.Get(StatType.Health)}");
+      _opponentStats.Update(stat, delta); 
     }
     else
     {
       _userStats.Update(stat, delta);
-      _results.Add($"Effect has changed user {stat} by {delta}! Now at {_userStats.Get(StatType.Health)}");
     }
     ProcessStatChangeTriggers(_user, _userStats, target, stat, delta);
     ProcessStatChangeTriggers(_opponent, _opponentStats, target, stat, delta);

@@ -57,11 +57,6 @@ public class GolemStats
     {
         _currentStats[stat] += amount;
     }
-
-    public void Reduce(StatType stat, int amount)
-    {
-        Update(stat, amount * -1);
-    }
     
     public int GetTriggerCount(Effect effect)
     {
