@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Api;
 using GolemCore.Models.Golem;
@@ -63,9 +61,6 @@ namespace MonoGameView
             buttonTexture.SetData(new[] { Color.ForestGreen });
 
             _arialFont = Content.Load<SpriteFont>("Arial");
-            
-            // Do this now so that its not null by the time Draw() is called
-            _combatButton = new Button("Fight", new Vector2(350, 200), 20, 40, buttonTexture, _arialFont, null);
 
             var grayTexture = new Texture2D(GraphicsDevice, 1, 1);
             grayTexture.SetData(new[] { Color.DarkSlateGray });
@@ -118,7 +113,7 @@ namespace MonoGameView
                 Exit();
 
             _clusterManager?.Update(mouseState);
-            _combatButton.Update(mouseState);
+            _combatButton?.Update(mouseState);
             _rerollButton?.Update(mouseState);
             _resultProjector?.Update(mouseState);
 
@@ -139,7 +134,7 @@ namespace MonoGameView
             {
                 grid?.Draw(_spriteBatch);
             }
-            _combatButton.Draw(_spriteBatch);
+            _combatButton?.Draw(_spriteBatch);
             _rerollButton?.Draw(_spriteBatch);
             _clusterManager?.DrawClusters(_spriteBatch);
             _resultProjector?.Draw(_spriteBatch);
