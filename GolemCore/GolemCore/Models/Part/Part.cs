@@ -48,6 +48,11 @@ public class Part
     {
       builder.AppendLine(trigger.ToString());
     }
+        
+    foreach (var effect in Effects)
+    {
+      builder.AppendLine(effect.ToString());
+    }
 
     return builder.ToString();
   }

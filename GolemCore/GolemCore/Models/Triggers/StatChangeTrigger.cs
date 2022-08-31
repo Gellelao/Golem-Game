@@ -1,5 +1,4 @@
 ﻿using GolemCore.Models.Enums;
-using GolemCore.Resolver;
 
 namespace GolemCore.Models.Triggers;
 
@@ -29,6 +28,10 @@ public class StatChangeTrigger : Trigger
 
     public override string ToString()
     {
-        return "TEST";
+        var tags = EffectTags.Any() ? $"{string.Join(" or ", EffectTags)} " : "";
+        var locator = EffectRange == Locator.Self ? "self" : $"{EffectRange.ToString()} {tags}parts";
+        var description = $"Triggers {locator} when {Target} {Stat} {DeltaType}s";
+        if (Threshold > 0) description += $" by more than {Threshold}";
+        return description;
     }
 }

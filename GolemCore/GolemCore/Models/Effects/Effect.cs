@@ -33,4 +33,6 @@ public abstract class Effect
         if (Charges == 0) return true;
         return Charges - timesTriggeredSoFar > 0;
     }
+
+    public abstract override string ToString();
 }

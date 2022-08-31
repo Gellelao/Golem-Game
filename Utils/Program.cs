@@ -160,6 +160,7 @@ var newParts = new List<Part>
         {
             new TurnTrigger
             {
+                EffectRange = Locator.Diagonal,
                 Frequency = 2,
                 StartingTurn = 2
             }
