@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GolemCore;
@@ -9,6 +10,7 @@ using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameView.Buttons;
 using MonoGameView.Drawing;
 using MonoGameView.Grids;
 
@@ -21,7 +23,7 @@ namespace MonoGameView
         private ShopView _shopView;
         private IGolemApiClient _client;
         private List<Grid> _grids;
-        private List<Button> _buttons;
+        private List<BaseButton> _buttons;
         private List<TempMessage> _tempMessages;
         private SpriteFont _arialFont;
         private PartValidator _validator;
@@ -40,7 +42,7 @@ namespace MonoGameView
         {
             _client = GolemApiClientFactory.Create();
             _grids = new List<Grid>();
-            _buttons = new List<Button>();
+            _buttons = new List<BaseButton>();
             _tempMessages = new List<TempMessage>();
             
             _graphics.PreferredBackBufferWidth = 1500;
@@ -79,7 +81,7 @@ namespace MonoGameView
 
             _buttons.Add(new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache)));
             _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll()));
-            _buttons.Add(new Button("Upload", new Vector2(250, 30), 20, 40, buttonTexture, _arialFont, () => OnUploadClicked(golem1)));
+            _buttons.Add(new AsyncButton("Upload", new Vector2(250, 30), 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1)));
 
             _shop = new Shop(partsCache);
 
@@ -189,6 +191,11 @@ namespace MonoGameView
 
         private async Task OnUploadClicked(Golem golem)
         {
+            if(_grids.OfType<GolemGrid>().Any(g => g.Valid == false))
+            {
+                _tempMessages.Add(new TempMessage("Invalid Grid", Color.Red, _arialFont, new Vector2(280, 30), 1500));
+                return;
+            }
             var golemRequest = new CreateGolemRequest
             {
                 Item = golem
