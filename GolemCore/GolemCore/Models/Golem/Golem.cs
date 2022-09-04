@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 using GolemCore.Extensions;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Triggers;
@@ -22,6 +23,7 @@ public class Golem
         new []{"-1","-1","-1","-1"}
     };
 
+    [JsonIgnore]
     public List<string> NonEmptyIdList
     {
         get { return PartIds.SelectMany(p => p).Where(id => id != "-1").ToList(); }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Api;
 using GolemCore.Models.Golem;
@@ -8,6 +9,7 @@ using GolemCore.Validation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameView.Drawing;
 using MonoGameView.Grids;
 
 namespace MonoGameView
@@ -19,11 +21,11 @@ namespace MonoGameView
         private ShopView _shopView;
         private IGolemApiClient _client;
         private List<Grid> _grids;
-        private Button _combatButton;
+        private List<Button> _buttons;
+        private List<TempMessage> _tempMessages;
         private SpriteFont _arialFont;
         private PartValidator _validator;
         private ClusterManager _clusterManager;
-        private Button _rerollButton;
         private ResultProjector _resultProjector;
         private Shop _shop;
 
@@ -38,6 +40,8 @@ namespace MonoGameView
         {
             _client = GolemApiClientFactory.Create();
             _grids = new List<Grid>();
+            _buttons = new List<Button>();
+            _tempMessages = new List<TempMessage>();
             
             _graphics.PreferredBackBufferWidth = 1500;
             _graphics.PreferredBackBufferHeight = 600;
@@ -73,8 +77,9 @@ namespace MonoGameView
             var parts = await _client.GetParts(new CancellationToken());
             var partsCache = new PartsCache(parts);
 
-            _combatButton = new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache));
-            _rerollButton = new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll());
+            _buttons.Add(new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache)));
+            _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll()));
+            _buttons.Add(new Button("Upload", new Vector2(250, 30), 20, 40, buttonTexture, _arialFont, () => OnUploadClicked(golem1)));
 
             _shop = new Shop(partsCache);
 
@@ -112,15 +117,29 @@ namespace MonoGameView
                 kstate.IsKeyDown(Keys.Escape))
                 Exit();
 
+            foreach (var button in _buttons)
+            {
+                button.Update(mouseState);
+            }
             _clusterManager?.Update(mouseState);
-            _combatButton?.Update(mouseState);
-            _rerollButton?.Update(mouseState);
             _resultProjector?.Update(mouseState);
 
             foreach (var grid in _grids)
             {
                 grid?.Update(mouseState);
             }
+
+            var messagesToRemove = new List<TempMessage>();
+            foreach (var message in _tempMessages)
+            {
+                message.Update();
+                if (message.Expired)
+                {
+                    messagesToRemove.Add(message);
+                }
+            }
+
+            _tempMessages.RemoveAll(m => messagesToRemove.Contains(m));
 
             base.Update(gameTime);
         }
@@ -134,8 +153,14 @@ namespace MonoGameView
             {
                 grid?.Draw(_spriteBatch);
             }
-            _combatButton?.Draw(_spriteBatch);
-            _rerollButton?.Draw(_spriteBatch);
+            foreach (var button in _buttons)
+            {
+                button.Draw(_spriteBatch);
+            }
+            foreach (var message in _tempMessages)
+            {
+                message.Draw(_spriteBatch);
+            }
             _clusterManager?.DrawClusters(_spriteBatch);
             _resultProjector?.Draw(_spriteBatch);
 
@@ -160,6 +185,20 @@ namespace MonoGameView
             _shop.IncrementRound();
             _shop.IncrementFunds();
             _shopView.Reroll();
+        }
+
+        private async Task OnUploadClicked(Golem golem)
+        {
+            var golemRequest = new CreateGolemRequest
+            {
+                Item = golem
+            };
+
+            var loadingMessage = new TempMessage("Uploading...", Color.Yellow, _arialFont, new Vector2(280, 30));
+            _tempMessages.Add(loadingMessage);
+            await _client.CreateGolem(golemRequest, new CancellationToken());
+            loadingMessage.ExpireTimer();
+            _tempMessages.Add(new TempMessage("Success!", Color.Green, _arialFont, new Vector2(280, 30), 1500));
         }
 
         private bool GolemGridsAreValid()
