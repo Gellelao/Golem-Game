@@ -23,7 +23,7 @@ public class GolemApiClient : IGolemApiClient
         Options = options;
     }
 
-    public async Task<List<Golem>> GetGolemSelection(CancellationToken cancellationToken)
+    public async Task<List<Golem>> GetAllGolems(CancellationToken cancellationToken)
     {
         var golems = await _httpClient.GetFromJsonAsync<GolemFetchResponse>(Constants.GetGolemEndpoint, cancellationToken);
 

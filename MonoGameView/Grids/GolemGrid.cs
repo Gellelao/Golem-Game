@@ -103,4 +103,16 @@ public class GolemGrid : Grid
         
         //Console.WriteLine(_golem);
     }
+
+    public void SetGolem(Golem golem)
+    {
+        _golem = golem;
+        for (var y = 0; y < Sockets.Length; y++)
+        {
+            for (var x = 0; x < Sockets[y].Length; x++)
+            {
+                Sockets[x][y].StorePart(golem.PartIds[x][y]);
+            }
+        }
+    }
 }

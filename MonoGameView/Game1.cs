@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,8 @@ namespace MonoGameView
         private ClusterManager _clusterManager;
         private ResultProjector _resultProjector;
         private Shop _shop;
+        private GolemGrid _playerGrid;
+        private GolemGrid _opponentGrid;
 
         public Game1()
         {
@@ -81,7 +84,10 @@ namespace MonoGameView
 
             _buttons.Add(new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache)));
             _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll()));
-            _buttons.Add(new AsyncButton("Upload", new Vector2(250, 30), 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1)));
+            var uploadButtonLocation = new Vector2(250, 30);
+            _buttons.Add(new AsyncButton("Upload", uploadButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1, uploadButtonLocation)));
+            var summonButtonLocation = new Vector2(600, 30);
+            _buttons.Add(new AsyncButton("Summon", summonButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnSummonClicked(summonButtonLocation)));
 
             _shop = new Shop(partsCache);
 
@@ -92,19 +98,17 @@ namespace MonoGameView
             _validator = new PartValidator(partsCache);
             
             Constants.SocketDistanceFromLeft = 200;
-            var grid1 = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
+            _playerGrid = new GolemGrid(golem1, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 500;
-            var grid2 = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
+            _opponentGrid = new GolemGrid(golem2, _validator, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 30;
             var storageGrid = new StorageGrid(2, 6, blankTexture, yellowTexture);
             Constants.SocketDistanceFromLeft = 800;
             var sellGrid = new SellGrid(_shopView, blankTexture, yellowTexture);
-            _grids.Add(grid1);
-            _grids.Add(grid2);
             _grids.Add(storageGrid);
             _grids.Add(sellGrid);
             
-            foreach (var grid in _grids)
+            foreach (var grid in _grids.Append(_playerGrid).Append(_opponentGrid))
             {
                 grid?.SubscribeToClusterEvents(_clusterManager);
             }
@@ -125,8 +129,8 @@ namespace MonoGameView
             }
             _clusterManager?.Update(mouseState);
             _resultProjector?.Update(mouseState);
-
-            foreach (var grid in _grids)
+            
+            foreach (var grid in _grids.Append(_playerGrid).Append(_opponentGrid))
             {
                 grid?.Update(mouseState);
             }
@@ -151,7 +155,8 @@ namespace MonoGameView
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            foreach (var grid in _grids)
+            
+            foreach (var grid in _grids.Append(_playerGrid).Append(_opponentGrid))
             {
                 grid?.Draw(_spriteBatch);
             }
@@ -178,7 +183,7 @@ namespace MonoGameView
 
         private void OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
         {
-            if (!GolemGridsAreValid()) return;
+            if (!_playerGrid.Valid || !_opponentGrid.Valid) return;
             var resolver = new CombatResolver(golem1, golem2, cache);
             var results = resolver.GetOutcome();
 
@@ -189,11 +194,12 @@ namespace MonoGameView
             _shopView.Reroll();
         }
 
-        private async Task OnUploadClicked(Golem golem)
+        private async Task OnUploadClicked(Golem golem, Vector2 uploadButtonLocation)
         {
-            if(_grids.OfType<GolemGrid>().Any(g => g.Valid == false))
+            var messageLocation = new Vector2(uploadButtonLocation.X + 20, uploadButtonLocation.Y);
+            if(!_playerGrid.Valid)
             {
-                _tempMessages.Add(new TempMessage("Invalid Grid", Color.Red, _arialFont, new Vector2(280, 30), 1500));
+                _tempMessages.Add(new TempMessage("Invalid Grid", Color.Red, _arialFont, messageLocation, 1500));
                 return;
             }
             var golemRequest = new CreateGolemRequest
@@ -201,26 +207,22 @@ namespace MonoGameView
                 Item = golem
             };
 
-            var loadingMessage = new TempMessage("Uploading...", Color.Yellow, _arialFont, new Vector2(280, 30));
+            var loadingMessage = new TempMessage("Uploading...", Color.Yellow, _arialFont, messageLocation);
             _tempMessages.Add(loadingMessage);
             await _client.CreateGolem(golemRequest, new CancellationToken());
             loadingMessage.ExpireTimer();
-            _tempMessages.Add(new TempMessage("Success!", Color.Green, _arialFont, new Vector2(280, 30), 1500));
+            _tempMessages.Add(new TempMessage("Success!", Color.Green, _arialFont, messageLocation, 1500));
         }
 
-        private bool GolemGridsAreValid()
+        private async Task OnSummonClicked(Vector2 summonButtonLocation)
         {
-            foreach (var grid in _grids)
-            {
-                switch (grid)
-                {
-                    case GolemGrid golemGrid:
-                        if (!golemGrid.Valid) return false;
-                        break;
-                }
-            }
-
-            return true;
+            var messageLocation = new Vector2(summonButtonLocation.X + 20, summonButtonLocation.Y);
+            var loadingMessage = new TempMessage("Summoning...", Color.Yellow, _arialFont, messageLocation);
+            _tempMessages.Add(loadingMessage);
+            var golems = await _client.GetAllGolems(new CancellationToken());
+            _opponentGrid.SetGolem(golems.First());
+            loadingMessage.ExpireTimer();
+            _tempMessages.Add(new TempMessage("Success!", Color.Green, _arialFont, messageLocation, 1500));
         }
     }
 }
