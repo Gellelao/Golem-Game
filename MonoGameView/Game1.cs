@@ -25,7 +25,8 @@ namespace MonoGameView
         private ShopView _shopView;
         private IGolemApiClient _client;
         private List<Grid> _grids;
-        private List<BaseButton> _buttons;
+        private List<Button> _buttons;
+        private List<AsyncButton> _asyncButtons;
         private List<TempMessage> _tempMessages;
         private SpriteFont _arialFont;
         private PartValidator _validator;
@@ -47,7 +48,8 @@ namespace MonoGameView
         {
             _client = GolemApiClientFactory.Create();
             _grids = new List<Grid>();
-            _buttons = new List<BaseButton>();
+            _buttons = new List<Button>();
+            _asyncButtons = new List<AsyncButton>();
             _tempMessages = new List<TempMessage>();
             
             _graphics.PreferredBackBufferWidth = 1500;
@@ -87,9 +89,9 @@ namespace MonoGameView
             _buttons.Add(new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache)));
             _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll()));
             var uploadButtonLocation = new Vector2(250, 30);
-            _buttons.Add(new AsyncButton("Upload", uploadButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1, uploadButtonLocation)));
+            _asyncButtons.Add(new AsyncButton("Upload", uploadButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1, uploadButtonLocation)));
             var summonButtonLocation = new Vector2(600, 30);
-            _buttons.Add(new AsyncButton("Summon", summonButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnSummonClicked(summonButtonLocation)));
+            _asyncButtons.Add(new AsyncButton("Summon", summonButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnSummonClicked(summonButtonLocation)));
 
             _shop = new Shop(partsCache);
 
@@ -118,7 +120,7 @@ namespace MonoGameView
             }
         }
 
-        protected override void Update(GameTime gameTime)
+        protected override async void Update(GameTime gameTime)
         {
             var kstate = Keyboard.GetState();
             var mouseState = Mouse.GetState();
@@ -130,6 +132,10 @@ namespace MonoGameView
             foreach (var button in _buttons)
             {
                 button.Update(mouseState);
+            }
+            foreach (var button in _asyncButtons)
+            {
+                await button.UpdateAsync(mouseState);
             }
             _clusterManager?.Update(mouseState);
             _resultProjector?.Update(mouseState);
@@ -165,6 +171,10 @@ namespace MonoGameView
                 grid?.Draw(_spriteBatch);
             }
             foreach (var button in _buttons)
+            {
+                button.Draw(_spriteBatch);
+            }
+            foreach (var button in _asyncButtons)
             {
                 button.Draw(_spriteBatch);
             }

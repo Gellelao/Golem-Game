@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -21,6 +22,4 @@ public abstract class BaseButton : Region
         base.Draw(spriteBatch);
         spriteBatch.DrawString(_font, _name, Position, Color.White);
     }
-
-    public abstract void Update(MouseState mouseState);
 }

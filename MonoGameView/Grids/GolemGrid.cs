@@ -104,14 +104,15 @@ public class GolemGrid : Grid
         //Console.WriteLine(_golem);
     }
 
-    public void SetGolem(Golem golem)
+    public void SetGolem(Golem golem, DraggablePart[][] draggableParts)
     {
         _golem = golem;
         for (var y = 0; y < Sockets.Length; y++)
         {
             for (var x = 0; x < Sockets[y].Length; x++)
             {
-                //Sockets[x][y].StorePart(golem.PartIds[x][y]);
+                if (draggableParts[x][y] == null) continue;
+                Sockets[x][y].StorePart(draggableParts[x][y]);
             }
         }
     }

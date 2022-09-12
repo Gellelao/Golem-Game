@@ -15,11 +15,11 @@ public class AsyncButton : BaseButton
         _func = func;
     }
 
-    public override void Update(MouseState mouseState)
+    public async Task UpdateAsync(MouseState mouseState)
     {
         if(Pressed && mouseState.LeftButton == ButtonState.Released && PointInBounds(mouseState.Position))
         {
-            _func();
+            await _func();
         }
         Pressed = mouseState.LeftButton == ButtonState.Pressed && PointInBounds(mouseState.Position);
     }

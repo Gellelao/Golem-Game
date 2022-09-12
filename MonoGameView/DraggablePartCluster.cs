@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GolemCore.Extensions;
 using GolemCore.Models.Part;
@@ -72,6 +73,20 @@ public class DraggablePartCluster
 
             UpdatePartPositionsToMatchCluster();
         }
+    }
+
+    public List<DraggablePart> GetDraggablePartList()
+    {
+        var draggableParts = new List<DraggablePart>();
+        for (var y = 0; y < _draggableParts.Length; y++)
+        {
+            for (var x = 0; x < _draggableParts[y].Length; x++)
+            {
+                draggableParts.Add(_draggableParts[x][y]);
+            }
+        }
+
+        return draggableParts;
     }
 
     public DraggablePart GetDraggableUnderMouse(Point mousePosition)

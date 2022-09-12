@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +15,7 @@ public class Button : BaseButton
         _action = action;
     }
 
-    public override void Update(MouseState mouseState)
+    public void Update(MouseState mouseState)
     {
         if(Pressed && mouseState.LeftButton == ButtonState.Released && PointInBounds(mouseState.Position))
         {
