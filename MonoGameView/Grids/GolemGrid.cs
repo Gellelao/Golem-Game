@@ -111,7 +111,7 @@ public class GolemGrid : Grid
         {
             for (var x = 0; x < Sockets[y].Length; x++)
             {
-                Sockets[x][y].StorePart(golem.PartIds[x][y]);
+                //Sockets[x][y].StorePart(golem.PartIds[x][y]);
             }
         }
     }

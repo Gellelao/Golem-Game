@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameView.Buttons;
 
-namespace MonoGameView;
+namespace MonoGameView.ScreenMessages;
 
 public class ResultProjector
 {

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Api;
+using GolemCore.Extensions;
 using GolemCore.Models.Golem;
 using GolemCore.Resolver;
 using GolemCore.Validation;
@@ -12,8 +13,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameView.Buttons;
-using MonoGameView.Drawing;
 using MonoGameView.Grids;
+using MonoGameView.ScreenMessages;
 
 namespace MonoGameView
 {
@@ -33,6 +34,7 @@ namespace MonoGameView
         private Shop _shop;
         private GolemGrid _playerGrid;
         private GolemGrid _opponentGrid;
+        private GolemMaterializer _materializer;
 
         public Game1()
         {
@@ -92,6 +94,8 @@ namespace MonoGameView
             _shop = new Shop(partsCache);
 
             _clusterManager = new ClusterManager(grayTexture, redTexture, _arialFont);
+
+            _materializer = new GolemMaterializer(partsCache, _clusterManager);
 
             _shopView = new ShopView(_shop, _clusterManager);
 
@@ -220,7 +224,9 @@ namespace MonoGameView
             var loadingMessage = new TempMessage("Summoning...", Color.Yellow, _arialFont, messageLocation);
             _tempMessages.Add(loadingMessage);
             var golems = await _client.GetAllGolems(new CancellationToken());
-            _opponentGrid.SetGolem(golems.First());
+            
+            _materializer.Materialize(golems.First(), _opponentGrid);
+            
             loadingMessage.ExpireTimer();
             _tempMessages.Add(new TempMessage("Success!", Color.Green, _arialFont, messageLocation, 1500));
         }
