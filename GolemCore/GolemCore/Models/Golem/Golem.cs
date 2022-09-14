@@ -41,6 +41,33 @@ public class Golem
 
         return builder.ToString();
     }
+
+    public List<string> GetNeighbourIds(string fullPartId, Locator locator)
+    {
+        var neighbours = new List<string>();
+        switch (locator)
+        {
+            case Locator.Self:
+                neighbours.Add(fullPartId);
+                break;
+            case Locator.Orthogonal:
+                neighbours.AddRange(GetOrthogonalNeighbourIds(fullPartId));
+                break;
+            case Locator.Diagonal:
+                throw new NotImplementedException("Haven't added a diagonal neighbour search yet");
+                break;
+            case Locator.Orthodiagonal:
+                neighbours.AddRange(GetOrthodiagonalNeighbourIds(fullPartId));
+                break;
+            case Locator.AllNorthernParts:
+                neighbours.AddRange(GetPartsNorthOf(fullPartId));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return neighbours;
+    }
     
     /// <summary>
     /// Given a full part id, get the ids of parts that share an edge with that part, on this golem
@@ -174,7 +201,7 @@ public class Golem
 
     private List<Part.Part> GetActivatedParts(Trigger trigger, string partId, PartsCache cache)
     {
-        var neighbouringPartIds = trigger.EffectRange.IdsOfNeighbouringParts(partId, this);
+        var neighbouringPartIds = GetNeighbourIds(partId, trigger.EffectRange);
         var neighbouringParts = neighbouringPartIds.Select(id => cache.Get(id.ToPartId()));
         var eligibleParts = neighbouringParts.Where(trigger.WouldActivate);
         return eligibleParts.Where(p => p.Effects.Any()).ToList();

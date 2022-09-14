@@ -10,7 +10,7 @@ public class Neighbourhood
 
     public int MatchingNeighboursCount(string fullPartId, Golem.Golem golem, PartsCache cache)
     {
-        var neighbours = Locator.IdsOfNeighbouringParts(fullPartId, golem);
+        var neighbours = golem.GetNeighbourIds(fullPartId, Locator);
         
         if (Tag == PartTag.NotNull)
         {
