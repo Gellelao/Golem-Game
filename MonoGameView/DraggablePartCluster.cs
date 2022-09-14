@@ -82,6 +82,7 @@ public class DraggablePartCluster
         {
             for (var x = 0; x < _draggableParts[y].Length; x++)
             {
+                if(_draggableParts[x][y] == null) continue;
                 draggableParts.Add(_draggableParts[x][y]);
             }
         }

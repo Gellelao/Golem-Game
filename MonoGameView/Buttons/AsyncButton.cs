@@ -19,6 +19,7 @@ public class AsyncButton : BaseButton
     {
         if(Pressed && mouseState.LeftButton == ButtonState.Released && PointInBounds(mouseState.Position))
         {
+            Pressed = false;
             await _func();
         }
         Pressed = mouseState.LeftButton == ButtonState.Pressed && PointInBounds(mouseState.Position);
