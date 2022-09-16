@@ -41,131 +41,6 @@ public class Golem
 
         return builder.ToString();
     }
-
-    public List<string> GetNeighbourIds(string fullPartId, Locator locator)
-    {
-        var neighbours = new List<string>();
-        switch (locator)
-        {
-            case Locator.Self:
-                neighbours.Add(fullPartId);
-                break;
-            case Locator.Orthogonal:
-                neighbours.AddRange(GetOrthogonalNeighbourIds(fullPartId));
-                break;
-            case Locator.Diagonal:
-                throw new NotImplementedException("Haven't added a diagonal neighbour search yet");
-                break;
-            case Locator.Orthodiagonal:
-                neighbours.AddRange(GetOrthodiagonalNeighbourIds(fullPartId));
-                break;
-            case Locator.AllNorthernParts:
-                neighbours.AddRange(GetPartsNorthOf(fullPartId));
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return neighbours;
-    }
-    
-    /// <summary>
-    /// Given a full part id, get the ids of parts that share an edge with that part, on this golem
-    /// </summary>
-    /// <param name="fullPartId">The part that marks the center of the neighbourhood search</param>
-    /// <returns> A list of the ids of the found neighbours</returns>
-    public List<string> GetOrthogonalNeighbourIds(string fullPartId)
-    {
-        var neighbours = new List<string>();
-        var ids = PartIds;
-        for (var y = 0; y < ids.Length; y++)
-        {
-            for (var x = 0; x < ids[y].Length; x++)
-            {
-                for (var offsetY = -1; offsetY < 2; offsetY++)
-                {
-                    for (var offsetX = -1; offsetX < 2; offsetX++)
-                    {
-                        // Don't consider the corners
-                        if (offsetX == -1 && offsetY == -1) continue;
-                        if (offsetX == -1 && offsetY == 1) continue;
-                        if (offsetX == 1 && offsetY == -1) continue;
-                        if (offsetX == 1 && offsetY == 1) continue;
-                        
-                        var resultY = y + offsetY;
-                        var resultX = x + offsetX;
-                        if (resultY < 0 || resultY >= ids.Length || resultX < 0 || resultX >= ids[y].Length) continue;
-                        if (ids[resultY][resultX] != fullPartId) continue;
-
-                        var candidateNeighbourId = ids[y][x];
-                        if (candidateNeighbourId != fullPartId && candidateNeighbourId != "-1") // don't add other parts from the same cluster
-                        {
-                            neighbours.Add(candidateNeighbourId);
-                        }
-                    }
-                }
-            }
-        }
-
-        return neighbours;
-    }
-    
-    /// <summary>
-    /// Given a full part id, get the ids of parts that share an edge or corner with that part, on this golem
-    /// </summary>
-    /// <param name="fullPartId">The part that marks the center of the neighbourhood search</param>
-    /// <returns> A list of the ids of the found neighbours</returns>
-    public List<string> GetOrthodiagonalNeighbourIds(string fullPartId)
-    {
-        var neighbours = new List<string>();
-        var ids = PartIds;
-        for (var y = 0; y < ids.Length; y++)
-        {
-            for (var x = 0; x < ids[y].Length; x++)
-            {
-                for (var offsetY = -1; offsetY < 2; offsetY++)
-                {
-                    for (var offsetX = -1; offsetX < 2; offsetX++)
-                    {
-                        var resultY = y + offsetY;
-                        var resultX = x + offsetX;
-                        if (resultY < 0 || resultY >= ids.Length || resultX < 0 || resultX >= ids[y].Length) continue;
-                        if (ids[resultY][resultX] != fullPartId) continue;
-
-                        var candidateNeighbourId = ids[y][x];
-                        if (candidateNeighbourId != fullPartId && candidateNeighbourId != "-1") // don't add other parts from the same cluster
-                        {
-                            neighbours.Add(candidateNeighbourId);
-                        }
-                    }
-                }
-            }
-        }
-
-        return neighbours;
-    }
-    
-    public List<string> GetPartsNorthOf(string fullPartId)
-    {
-        var neighbours = new List<string>();
-        var ids = PartIds;
-        for (var y = 0; y < ids.Length; y++)
-        {
-            for (var x = 0; x < ids[y].Length; x++)
-            {
-                if (ids[y][x] != fullPartId) continue;
-                for (var i = y; i >= 0; i--)
-                {
-                    if (ids[i][x] != "-1" && ids[i][x] != fullPartId)
-                    {
-                        neighbours.Add(ids[i][x]);
-                    }
-                }
-            }
-        }
-
-        return neighbours;
-    }
     
     public List<Part.Part> GetPartsActivatedByTurn(int turnNumber, PartsCache partsCache)
     {
@@ -197,6 +72,101 @@ public class Golem
             }
         }
         return activatedParts.Distinct().ToList();
+    }
+
+    public List<string> GetNeighbourIds(string fullPartId, Locator locator)
+    {
+        var neighbours = new List<string>();
+        switch (locator)
+        {
+            case Locator.Self:
+                neighbours.Add(fullPartId);
+                break;
+            case Locator.AllNorthernParts:
+                neighbours.AddRange(GetPartsNorthOf(fullPartId));
+                break;
+            case Locator.Orthogonal:
+            case Locator.Diagonal:
+            case Locator.Orthodiagonal:
+            default:
+                neighbours.AddRange(GetSurroundingNeighbourIds(fullPartId, locator));
+                break;
+        }
+
+        return neighbours;
+    }
+    
+    /// <summary>
+    /// Given a full part id, get the ids of parts that share an edge with that part, on this golem
+    /// </summary>
+    /// <param name="fullPartId">The part that marks the center of the neighbourhood search</param>
+    /// <returns> A list of the ids of the found neighbours</returns>
+    private List<string> GetSurroundingNeighbourIds(string fullPartId, Locator locator)
+    {
+        var neighbours = new List<string>();
+        var ids = PartIds;
+        for (var y = 0; y < ids.Length; y++)
+        {
+            for (var x = 0; x < ids[y].Length; x++)
+            {
+                for (var offsetY = -1; offsetY < 2; offsetY++)
+                {
+                    for (var offsetX = -1; offsetX < 2; offsetX++)
+                    {
+                        if (locator == Locator.Orthogonal)
+                        {
+                            // Don't consider the corners
+                            if (offsetX == -1 && offsetY == -1) continue;
+                            if (offsetX == -1 && offsetY == 1) continue;
+                            if (offsetX == 1 && offsetY == -1) continue;
+                            if (offsetX == 1 && offsetY == 1) continue;
+                        }
+                        if (locator == Locator.Diagonal)
+                        {
+                            // Only consider the corners
+                            if (offsetX == 0 && offsetY == -1) continue;
+                            if (offsetX == 0 && offsetY == 1) continue;
+                            if (offsetX == 1 && offsetY == 0) continue;
+                            if (offsetX == -1 && offsetY == 0) continue;
+                        }
+                        var resultY = y + offsetY;
+                        var resultX = x + offsetX;
+                        if (resultY < 0 || resultY >= ids.Length || resultX < 0 || resultX >= ids[y].Length) continue;
+                        if (ids[resultY][resultX] != fullPartId) continue;
+
+                        var candidateNeighbourId = ids[y][x];
+                        if (candidateNeighbourId != fullPartId && candidateNeighbourId != "-1") // don't add other parts from the same cluster
+                        {
+                            neighbours.Add(candidateNeighbourId);
+                        }
+                    }
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
+    private List<string> GetPartsNorthOf(string fullPartId)
+    {
+        var neighbours = new List<string>();
+        var ids = PartIds;
+        for (var y = 0; y < ids.Length; y++)
+        {
+            for (var x = 0; x < ids[y].Length; x++)
+            {
+                if (ids[y][x] != fullPartId) continue;
+                for (var i = y; i >= 0; i--)
+                {
+                    if (ids[i][x] != "-1" && ids[i][x] != fullPartId)
+                    {
+                        neighbours.Add(ids[i][x]);
+                    }
+                }
+            }
+        }
+
+        return neighbours;
     }
 
     private List<Part.Part> GetActivatedParts(Trigger trigger, string partId, PartsCache cache)
