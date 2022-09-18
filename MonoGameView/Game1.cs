@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GolemCore;
 using GolemCore.Api;
-using GolemCore.Extensions;
 using GolemCore.Models.Golem;
 using GolemCore.Resolver;
 using GolemCore.Validation;
@@ -15,6 +14,8 @@ using Microsoft.Xna.Framework.Input;
 using MonoGameView.Buttons;
 using MonoGameView.Grids;
 using MonoGameView.ScreenMessages;
+using Serilog;
+using Serilog.Core;
 
 namespace MonoGameView
 {
@@ -36,16 +37,24 @@ namespace MonoGameView
         private GolemGrid _playerGrid;
         private GolemGrid _opponentGrid;
         private GolemMaterializer _materializer;
+        private Logger _log;
 
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);            
+            _log = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .Enrich.WithProperty("Project", "MonoGameView")
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Project} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
         protected override void Initialize()
         {
+            _log.Information("Initialization begin");
             _client = GolemApiClientFactory.Create();
             _grids = new List<Grid>();
             _buttons = new List<Button>();
@@ -55,11 +64,14 @@ namespace MonoGameView
             _graphics.PreferredBackBufferWidth = 1500;
             _graphics.PreferredBackBufferHeight = 600;
             _graphics.ApplyChanges();
+
             base.Initialize();
+            _log.Information("Initialization complete");
         }
 
         protected override async void LoadContent()
         {
+            _log.Information("LoadContent begin");
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             var blankTexture = new Texture2D(GraphicsDevice, 1, 1);
@@ -87,7 +99,7 @@ namespace MonoGameView
             var partsCache = new PartsCache(parts);
 
             _buttons.Add(new Button("Fight", new Vector2(450, 200), 20, 40, buttonTexture, _arialFont, () => OnFightClicked(golem1, golem2, partsCache)));
-            _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => _shopView.Reroll()));
+            _buttons.Add(new Button("Reroll", new Vector2(450, 400), 20, 40, buttonTexture, _arialFont, () => OnRerollClicked()));
             var uploadButtonLocation = new Vector2(250, 30);
             _asyncButtons.Add(new AsyncButton("Upload", uploadButtonLocation, 20, 40, buttonTexture, _arialFont, async () => await OnUploadClicked(golem1, uploadButtonLocation)));
             var summonButtonLocation = new Vector2(600, 30);
@@ -118,6 +130,8 @@ namespace MonoGameView
             {
                 grid?.SubscribeToClusterEvents(_clusterManager);
             }
+            
+            _log.Information("LoadContent complete");
         }
 
         protected override async void Update(GameTime gameTime)
@@ -195,9 +209,20 @@ namespace MonoGameView
             base.Draw(gameTime);
         }
 
+        private void OnRerollClicked()
+        {
+            _log.Debug("Reroll button clicked");
+            _shopView.Reroll();
+        }
+
         private void OnFightClicked(Golem golem1, Golem golem2, PartsCache cache)
         {
-            if (!_playerGrid.Valid || !_opponentGrid.Valid) return;
+            _log.Debug("Fight button clicked");
+            if (!_playerGrid.Valid || !_opponentGrid.Valid)
+            {
+                _log.Debug("Player grid valid: {a}. Opponent grid valid: {b}", _playerGrid.Valid, _opponentGrid.Valid);
+                return;
+            }
             var resolver = new CombatResolver(golem1, golem2, cache);
             var results = resolver.GetOutcome();
 
@@ -210,6 +235,7 @@ namespace MonoGameView
 
         private async Task OnUploadClicked(Golem golem, Vector2 uploadButtonLocation)
         {
+            _log.Debug("Upload button clicked");
             var messageLocation = new Vector2(uploadButtonLocation.X + 20, uploadButtonLocation.Y);
             if(!_playerGrid.Valid)
             {
@@ -230,6 +256,7 @@ namespace MonoGameView
 
         private async Task OnSummonClicked(Vector2 summonButtonLocation)
         {
+            _log.Debug("Summon button clicked");
             var messageLocation = new Vector2(summonButtonLocation.X + 20, summonButtonLocation.Y);
             var loadingMessage = new TempMessage("Summoning...", Color.Yellow, _arialFont, messageLocation);
             _tempMessages.Add(loadingMessage);

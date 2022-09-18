@@ -23,7 +23,6 @@ public class GolemGrid : Grid
     protected override void UpdateSource(bool doValidation)
     {
         var partIdToCluster = new Dictionary<int, List<DraggablePartCluster>>();
-        var valid = true;
         
         foreach (var line in Sockets)
         {
@@ -61,7 +60,32 @@ public class GolemGrid : Grid
             }
         }
 
-        if (!doValidation) return;
+        if (doValidation)
+        {
+            ValidateGolem(partIdToCluster);
+        }
+    }
+
+    public void SetGolem(Golem golem, DraggablePart[][] draggableParts)
+    {
+        _golem = golem;
+        for (var y = 0; y < Sockets.Length; y++)
+        {
+            for (var x = 0; x < Sockets[y].Length; x++)
+            {
+                if (draggableParts[x][y] == null) continue;
+                Sockets[x][y].StorePart(draggableParts[x][y]);
+            }
+        }
+
+        // Only valid golems can be uploaded
+        // CURRENTLY the only thing calling this is the Summon() button, but if that changes might need to rethink this
+        Valid = true;
+    }
+
+    private void ValidateGolem(Dictionary<int, List<DraggablePartCluster>> partIdToCluster)
+    {
+        var valid = true;
         
         foreach (var line in _golem.PartIds)
         {
@@ -98,22 +122,6 @@ public class GolemGrid : Grid
             }
         }
 
-        // only allow the golem to be uploaded if it is valid. But locally we permit an invalid golem
         Valid = valid;
-        
-        //Console.WriteLine(_golem);
-    }
-
-    public void SetGolem(Golem golem, DraggablePart[][] draggableParts)
-    {
-        _golem = golem;
-        for (var y = 0; y < Sockets.Length; y++)
-        {
-            for (var x = 0; x < Sockets[y].Length; x++)
-            {
-                if (draggableParts[x][y] == null) continue;
-                Sockets[x][y].StorePart(draggableParts[x][y]);
-            }
-        }
     }
 }
