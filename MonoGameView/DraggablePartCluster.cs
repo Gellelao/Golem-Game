@@ -78,9 +78,9 @@ public class DraggablePartCluster
     public List<DraggablePart> GetDraggablePartList()
     {
         var draggableParts = new List<DraggablePart>();
-        for (var y = 0; y < _draggableParts.Length; y++)
+        for (var x = 0; x < _draggableParts.Length; x++)
         {
-            for (var x = 0; x < _draggableParts[y].Length; x++)
+            for (var y = 0; y < _draggableParts[x].Length; y++)
             {
                 if(_draggableParts[x][y] == null) continue;
                 draggableParts.Add(_draggableParts[x][y]);

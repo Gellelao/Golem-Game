@@ -19,7 +19,7 @@ public abstract class Grid
 
     protected Grid(int width, int height, Texture2D blankTexture, Texture2D highlightTexture)
     {
-        Sockets = new PartSocket[width][];
+        Sockets = new PartSocket[height][];
         _onStartDrag = (sender, eventArgs) =>
         {
             _currentCluster = eventArgs.Cluster;
@@ -39,8 +39,8 @@ public abstract class Grid
         {
             for(var y = 0; y < height; y++)
             {
-                Sockets[x] ??= new PartSocket[height];
-                Sockets[x][y] ??= new PartSocket(new Vector2(x, y), Constants.SocketSize, Constants.SocketSize, blankTexture, highlightTexture);
+                Sockets[y] ??= new PartSocket[width];
+                Sockets[y][x] ??= new PartSocket(new Vector2(x, y), Constants.SocketSize, Constants.SocketSize, blankTexture, highlightTexture);
             }
         }
     }

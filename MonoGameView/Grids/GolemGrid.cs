@@ -69,9 +69,9 @@ public class GolemGrid : Grid
     public void SetGolem(Golem golem, DraggablePart[][] draggableParts)
     {
         _golem = golem;
-        for (var y = 0; y < Sockets.Length; y++)
+        for (var x = 0; x < Sockets.Length; x++)
         {
-            for (var x = 0; x < Sockets[y].Length; x++)
+            for (var y = 0; y < Sockets[x].Length; y++)
             {
                 if (draggableParts[x][y] == null) continue;
                 Sockets[x][y].StorePart(draggableParts[x][y]);

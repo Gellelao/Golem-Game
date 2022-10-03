@@ -43,9 +43,9 @@ public class GolemMaterializer
         // Fill in that parts array with the DraggableParts generated earlier. Looks up the draggablePart list
         // via the id in the Golem partIds, and remove the part from the list after use so that the next part
         // will be used on next loop
-        for (var y = 0; y < golem.PartIds.Length; y++)
+        for (var x = 0; x < golem.PartIds.Length; x++)
         {
-            for (var x = 0; x < golem.PartIds.Length; x++)
+            for (var y = 0; y < golem.PartIds.Length; y++)
             {
                 var id = golem.PartIds[x][y];
                 if (id == "-1") continue;
