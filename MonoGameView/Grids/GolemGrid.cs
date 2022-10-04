@@ -51,11 +51,11 @@ public class GolemGrid : Grid
                     }
 
                     var idWithSuffix = socket.StoredPart.Part.Id + (suffix > 0 ? $".{suffix}" : "");
-                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = idWithSuffix;
+                    _golem.PartIds[(int) socket.GolemPartIndex.X][(int) socket.GolemPartIndex.Y] = idWithSuffix;
                 }
                 else
                 {
-                    _golem.PartIds[(int) socket.GolemPartIndex.Y][(int) socket.GolemPartIndex.X] = "-1";   
+                    _golem.PartIds[(int) socket.GolemPartIndex.X][(int) socket.GolemPartIndex.Y] = "-1";   
                 }
             }
         }
