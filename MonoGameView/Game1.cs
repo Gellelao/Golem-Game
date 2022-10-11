@@ -196,7 +196,7 @@ namespace MonoGameView
             {
                 message.Draw(_spriteBatch);
             }
-            _clusterManager?.DrawClusters(_spriteBatch);
+            _clusterManager?.Draw(_spriteBatch);
             _resultProjector?.Draw(_spriteBatch);
 
             if (_shopView != null)

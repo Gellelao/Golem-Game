@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using GolemCore.Extensions;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Triggers;
-using GolemCore.Resolver;
 
 namespace GolemCore.Models.Golem;
 
@@ -17,10 +16,12 @@ public class Golem
     public int Version { get; init; } = 1;
     public string[][] PartIds { get; init; } =
     {
-        new []{"-1","-1","-1","-1"},
-        new []{"-1","-1","-1","-1"},
-        new []{"-1","-1","-1","-1"},
-        new []{"-1","-1","-1","-1"}
+        new []{"-1","-1","-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1","-1","-1"},
+        new []{"-1","-1","-1","-1","-1","-1"}
     };
 
     [JsonIgnore]
