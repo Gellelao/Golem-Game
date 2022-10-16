@@ -45,12 +45,13 @@ public class CombatResolver
       ProcessTurnTriggers(_user, _userStats, turnCounter);
       ProcessTurnTriggers(_opponent, _opponentStats, turnCounter);
       
+      _results.Add($"--------------turn {turnCounter} over");
+      
       if (turnCounter >= Constants.TurnLimit)
       {
         _results.Add($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
         break;
       }
-      _results.Add($"--------------turn {turnCounter} over");
     }
 
     return _results;
@@ -59,12 +60,6 @@ public class CombatResolver
   private void ProcessTurnTriggers(Golem golem, GolemStats golemStats, int turnNumber)
   {
     var userActivatedParts = golem.GetPartsActivatedByTurn(turnNumber, _cache);
-    ProcessEffects(golemStats, userActivatedParts);
-  }
-  
-  private void ProcessStatChangeTriggers(Golem golem, GolemStats golemStats, Target target, StatType statType, int delta)
-  {
-    var userActivatedParts = golem.GetPartsActivatedByStatChange(target, statType, delta, _cache);
     ProcessEffects(golemStats, userActivatedParts);
   }
 
@@ -112,6 +107,12 @@ public class CombatResolver
     }
     ProcessStatChangeTriggers(_user, _userStats, target, stat, delta);
     ProcessStatChangeTriggers(_opponent, _opponentStats, target, stat, delta);
+  }
+  
+  private void ProcessStatChangeTriggers(Golem golem, GolemStats golemStats, Target target, StatType statType, int delta)
+  {
+    var userActivatedParts = golem.GetPartsActivatedByStatChange(target, statType, delta, _cache);
+    ProcessEffects(golemStats, userActivatedParts);
   }
 }
 
