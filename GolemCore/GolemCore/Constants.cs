@@ -13,11 +13,11 @@ public static class Constants
     public const int StartingFunds = 200;
     public const int StartingShopPartCount = 4;
 
-    public static Dictionary<StatType, int> DefaultStats = new()
+    public static readonly Dictionary<StatType, int> DefaultStats = new()
     {
         {StatType.Attack, 1},
         {StatType.Health, 5},
-        {StatType.Speed, 0},
+        {StatType.Speed, 5},
         {StatType.Water, 0},
     };
 }
