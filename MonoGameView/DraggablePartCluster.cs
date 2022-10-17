@@ -62,7 +62,7 @@ public class DraggablePartCluster
                 part.Draw(spriteBatch);
             }
         }
-        spriteBatch.DrawString(_arialFont, $"{Part.Name}\n{Part.GetDescription()}", _position, Color.SkyBlue);
+        spriteBatch.DrawString(_arialFont, $"{Part.Name}", _position, Color.SkyBlue);
     }
 
     public void Update(MouseState mouseState)

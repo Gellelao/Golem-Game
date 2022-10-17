@@ -27,6 +27,11 @@ var newParts = new List<Part>
             {
                 Modifier = 1,
                 Type = StatType.Health
+            },
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Weight
             }
         },
         Shape = CommonPartProperties.TwoByTwoTileShape
@@ -47,6 +52,11 @@ var newParts = new List<Part>
             {
                 Modifier = 3,
                 Type = StatType.Health
+            },
+            new()
+            {
+                Modifier = 2,
+                Type = StatType.Weight
             }
         },
         Restrictions = new List<NeighbourhoodRequirement>
@@ -77,6 +87,11 @@ var newParts = new List<Part>
                     Tag = PartTag.Fire
                 }
             },
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Weight
+            }
         }
     },
     new()
@@ -97,6 +112,11 @@ var newParts = new List<Part>
                     Tag = PartTag.Mossy
                 }
             },
+            new()
+            {
+                Modifier = 5,
+                Type = StatType.Weight
+            }
         },
         Shape = new[]
         {
@@ -119,6 +139,11 @@ var newParts = new List<Part>
                 Modifier = 1,
                 Type = StatType.Health
             },
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Weight
+            }
         }
     },
     new()
@@ -140,6 +165,11 @@ var newParts = new List<Part>
                     Tag = PartTag.NotNull
                 }
             },
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Weight
+            }
         },
         Shape = new[]
         {
@@ -155,7 +185,14 @@ var newParts = new List<Part>
         Name = "Quartz Crystal",
         Tier = Tier.Common,
         Tags = new List<PartTag>(),
-        Stats = new List<Stat>(),
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Weight
+            }
+        },
         Triggers = new List<Trigger>
         {
             new TurnTrigger
@@ -172,7 +209,14 @@ var newParts = new List<Part>
         Name = "Gargoyle Head",
         Tier = Tier.Common,
         Tags = new List<PartTag>(),
-        Stats = new List<Stat>(),
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 4,
+                Type = StatType.Weight
+            }
+        },
         Shape = CommonPartProperties.TwoByTwoTileShape,
         Effects = new List<Effect>
         {
@@ -204,6 +248,11 @@ var newParts = new List<Part>
             {
                 Type = StatType.Health,
                 Modifier = 2
+            },
+            new()
+            {
+                Modifier = 2,
+                Type = StatType.Weight
             }
         },
         Triggers = new List<Trigger>
@@ -225,6 +274,32 @@ var newParts = new List<Part>
                 Delta = 1,
                 Charges = 3
             },
+        }
+    },
+    new()
+    {
+        Id = 9,
+        Name = "Leg",
+        Tier = Tier.Common,
+        Stats = new List<Stat>
+        {
+            new()
+            {
+                Modifier = 1,
+                Type = StatType.Weight
+            },
+            new()
+            {
+                Modifier = 3,
+                Type = StatType.Speed
+            }
+        },
+        Shape = new[]
+        {
+            new[] {true, true, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false},
+            new[] {false, false, false, false}
         }
     }
 };
