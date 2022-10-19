@@ -32,7 +32,7 @@ public class GolemStats
 
     public int SumStat(StatType typeToSum)
     {
-        var sum = Constants.DefaultStats[typeToSum];
+        var sum = Constants.InitialStats[typeToSum];
         List<string> seenParts = new List<string>();
         foreach (var idList in _golem.PartIds)
         {

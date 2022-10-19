@@ -1,8 +1,8 @@
-﻿using GolemCore.Models;
-using GolemCore.Models.Effects;
+﻿using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
+using Serilog;
 
 namespace GolemCore.Resolver;
 
@@ -13,6 +13,7 @@ public class CombatResolver
   private GolemStats _userStats;
   private GolemStats _opponentStats;
   private PartsCache _cache;
+  private readonly ILogger _log;
   private List<string> _results;
 
   public CombatResolver(Golem user, Golem opponent, PartsCache partsCache)
@@ -23,6 +24,12 @@ public class CombatResolver
     _opponentStats = new GolemStats(opponent, partsCache);
     _cache = partsCache;
     _results = new List<string>();
+    
+    _log = new LoggerConfiguration()
+      .MinimumLevel.Debug()
+      .Enrich.WithProperty("Project", "GolemCore")
+      .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Project} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+      .CreateLogger();
   }
 
   public List<string> GetOutcome()
@@ -32,9 +39,26 @@ public class CombatResolver
     _results.Add($"User stats: {_userStats}");
     _results.Add($"Opponent stats: {_opponentStats}");
 
+    var momentumTracker = new MomentumTracker(_userStats, _opponentStats, _log);
+
     while (_userStats.Get(StatType.Health) > 0 && _opponentStats.Get(StatType.Health) > 0)
     {
       turnCounter++; // this makes the first turn "turn 1" instead of zero
+      
+      var nextToGo = momentumTracker.GetNextGolem();
+      _log.Debug("Next to attack is {a} ", nextToGo);
+
+      switch (nextToGo)
+      {
+        case AttackOrder.User:
+          break;
+        case AttackOrder.Opponent:
+          break;
+        case AttackOrder.Simultaneous:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
       
       _results.Add($"You do {_userStats.Get(StatType.Attack)} damage to opponent");
       UpdateGolemStats(Target.Opponent, StatType.Health, _userStats.Get(StatType.Attack) * -1);
@@ -44,6 +68,9 @@ public class CombatResolver
 
       ProcessTurnTriggers(_user, _userStats, turnCounter);
       ProcessTurnTriggers(_opponent, _opponentStats, turnCounter);
+      
+      // Implement a stat buffer, so we can process effects in an order without the stat changes affecting the following effects
+      // Like in cellular automata you calculate the next state without changing the state, then update the entire state simultaneously
       
       _results.Add($"--------------turn {turnCounter} over");
       
