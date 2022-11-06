@@ -22,15 +22,6 @@ public class GolemStats
         CalculateStats();
     }
 
-    public GolemStats(GolemStats golemStats)
-    {
-        _golem = golemStats._golem;
-        _cache = golemStats._cache;
-        _currentStats = golemStats._currentStats;
-        _effectTriggerCounts = golemStats._effectTriggerCounts;
-        CalculateStats();
-    }
-
     private void CalculateStats()
     {
         foreach (var statType in Enum.GetValues<StatType>())
