@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using GolemCore.Extensions;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Triggers;
+using GolemCore.Resolver;
 
 namespace GolemCore.Models.Golem;
 
@@ -59,7 +60,7 @@ public class Golem
         return activatedParts.Distinct().ToList();
     }
 
-    public List<Part.Part> GetPartsActivatedByStatChange(Target target, StatType statType, int delta, PartsCache partsCache)
+    public List<Part.Part> GetPartsActivatedByStatChange(StatChange statChange, PartsCache partsCache)
     {
         var activatedParts = new List<Part.Part>();
         foreach (var partId in NonEmptyIdList)
@@ -68,8 +69,13 @@ public class Golem
             foreach (var trigger in part.Triggers)
             {
                 if (trigger is not StatChangeTrigger statTrigger) continue;
-                if (!statTrigger.Triggered(target, statType, delta)) continue;
-                activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
+                foreach (var (target, statType, delta) in statChange.Changes)
+                {
+                    if (statTrigger.Triggered(target, statType, delta))
+                    {
+                        activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
+                    };
+                }
             }
         }
         return activatedParts.Distinct().ToList();
