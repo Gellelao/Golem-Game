@@ -22,6 +22,15 @@ public class GolemStats
         CalculateStats();
     }
 
+    public GolemStats(GolemStats golemStats)
+    {
+        _golem = golemStats._golem;
+        _cache = golemStats._cache;
+        _currentStats = golemStats._currentStats;
+        _effectTriggerCounts = golemStats._effectTriggerCounts;
+        CalculateStats();
+    }
+
     private void CalculateStats()
     {
         foreach (var statType in Enum.GetValues<StatType>())
@@ -58,12 +67,12 @@ public class GolemStats
         _currentStats[stat] += amount;
     }
     
-    public int GetTriggerCount(Effect effect)
+    public int GetEffectTriggerCount(Effect effect)
     {
         return !_effectTriggerCounts.ContainsKey(effect) ? 0 : _effectTriggerCounts[effect];
     }
 
-    public void IncrementEffectCount(Effect effect)
+    public void IncrementEffectTriggerCount(Effect effect)
     {
         if (_effectTriggerCounts.ContainsKey(effect))
         {
