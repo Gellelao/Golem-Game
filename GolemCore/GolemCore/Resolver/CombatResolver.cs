@@ -56,6 +56,7 @@ public class CombatResolver
       switch (nextToGo)
       {
         case AttackOrder.User:
+          _results.Add($"You attack the opponent");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
@@ -65,6 +66,7 @@ public class CombatResolver
           });
           break;
         case AttackOrder.Opponent:
+          _results.Add($"The opponent attacks you");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
@@ -74,6 +76,7 @@ public class CombatResolver
           });
           break;
         case AttackOrder.Simultaneous:
+          _results.Add($"You attack each other at the same time");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
@@ -181,9 +184,11 @@ public class CombatResolver
       switch (target)
       {
         case Target.User:
+          _results.Add($"Your golem has its {statType} changed by {delta}");
           _userStats.Update(statType, delta);
           break;
         case Target.Opponent:
+          _results.Add($"Your opponent has its {statType} changed by {delta}");
           _userStats.Update(statType, delta);
           break;
         default:
