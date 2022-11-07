@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using GolemCore.Models.Effects;
+﻿using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
@@ -40,8 +39,8 @@ public class CombatResolver
   {
     var turnCounter = 0;
 
-    _results.Add($"User stats: {_userStats}");
-    _results.Add($"Opponent stats: {_opponentStats}");
+    LogAndAddToResult($"User stats: {_userStats}");
+    LogAndAddToResult($"Opponent stats: {_opponentStats}");
 
     var momentumTracker = new MomentumTracker(_userStats, _opponentStats, _log);
 
@@ -56,7 +55,7 @@ public class CombatResolver
       switch (nextToGo)
       {
         case AttackOrder.User:
-          _results.Add($"You attack the opponent");
+          LogAndAddToResult($"You attack the opponent");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
@@ -66,22 +65,22 @@ public class CombatResolver
           });
           break;
         case AttackOrder.Opponent:
-          _results.Add($"The opponent attacks you");
+          LogAndAddToResult($"The opponent attacks you");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
             {
-              (Target.User, StatType.Health, _opponentStats.Get(StatType.Attack) * -1)
+              (Target.Self, StatType.Health, _opponentStats.Get(StatType.Attack) * -1)
             }
           });
           break;
         case AttackOrder.Simultaneous:
-          _results.Add($"You attack each other at the same time");
+          LogAndAddToResult($"You attack each other at the same time");
           _statChangeQueue.Enqueue(new StatChange
           {
             Changes = new List<(Target, StatType, int)>
             {
-              (Target.User, StatType.Health, _opponentStats.Get(StatType.Attack) * -1),
+              (Target.Self, StatType.Health, _opponentStats.Get(StatType.Attack) * -1),
               (Target.Opponent, StatType.Health, _userStats.Get(StatType.Attack) * -1)
             }
           });
@@ -94,13 +93,15 @@ public class CombatResolver
       {
         var statChange = _statChangeQueue.Dequeue();
         ApplyStatChanges(statChange);
+        _log.Debug("Applying statChange {@a}", statChange.Changes);
+        
         var userActivatedParts = new List<Part>();
         var opponentActivatedParts = new List<Part>();
         foreach (var (target, statType, delta) in statChange.Changes)
         {
           switch (target)
           {
-            case Target.User:
+            case Target.Self:
               userActivatedParts.AddRange(_user.GetPartsActivatedByStatChange(statChange, _cache));
               break;
             case Target.Opponent:
@@ -110,18 +111,27 @@ public class CombatResolver
               throw new ArgumentOutOfRangeException();
           }
         }
+        
+        _log.Debug("Number of user activated parts:     {a}", userActivatedParts.Count);
+        _log.Debug("Number of opponent activated parts: {a}", opponentActivatedParts.Count);
 
         var statChangesFromUserEffects = GetStatChangesFromTriggeredPartEffects(userActivatedParts, _userStats);
         var statChangesFromOpponentEffects = GetStatChangesFromTriggeredPartEffects(opponentActivatedParts, _opponentStats);
-        _statChangeQueue.Enqueue(new StatChange
+        var combinedEffects = statChangesFromUserEffects.Concat(statChangesFromOpponentEffects).ToList();
+        if (combinedEffects.Any())
         {
-          Changes = statChangesFromUserEffects.Concat(statChangesFromOpponentEffects).ToList()
-        });
+          _log.Debug("Queuing statChange {@a}", combinedEffects);
+          _statChangeQueue.Enqueue(new StatChange
+          {
+            Changes = combinedEffects
+          });
+        }
       }
 
       var userTurnActivatedParts = GetStatChangesFromTriggeredPartEffects(_user.GetPartsActivatedByTurn(turnCounter, _cache), _userStats);
       var opponentTurnActivatedParts = GetStatChangesFromTriggeredPartEffects(_opponent.GetPartsActivatedByTurn(turnCounter, _cache), _opponentStats);
       var statChangesFromTurn = userTurnActivatedParts.Concat(opponentTurnActivatedParts).ToList();
+      _log.Debug("Any stat changes from turn counter: {a}", statChangesFromTurn.Any());
       if (statChangesFromTurn.Any())
       {
         ApplyStatChanges(new StatChange
@@ -130,11 +140,11 @@ public class CombatResolver
         });
       }
 
-      _results.Add($"--------------turn {turnCounter} over");
+      LogAndAddToResult($"--------------turn {turnCounter} over");
       
       if (turnCounter >= Constants.TurnLimit)
       {
-        _results.Add($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
+        LogAndAddToResult($"Turn limit has been reached after {turnCounter} turns. Game is a draw!");
         break;
       }
     }
@@ -147,18 +157,18 @@ public class CombatResolver
     List<(Target, StatType, int)> changesFromEffects = new List<(Target, StatType, int)>();
     foreach (var part in activatedParts)
     {
-      _results.Add($"{part.Name} activated!");
+      LogAndAddToResult($"{part.Name} activated!");
       foreach (var effect in part.Effects)
       {
         if (!effect.RequirementMet(_userStats, _opponentStats))
         {
-          _results.Add($"{part.Name} effect requirement is not met");
+          LogAndAddToResult($"{part.Name} effect requirement is not met");
           break;
         }
 
         if (!effect.HasChargesLeft(golemStats.GetEffectTriggerCount(effect)))
         {
-          _results.Add($"{part.Name} effect has no charges remaining");
+          LogAndAddToResult($"{part.Name} effect has no charges remaining");
           break;
         }
 
@@ -168,7 +178,7 @@ public class CombatResolver
         {
           case StatChangeEffect statChangeEffect:
             changesFromEffects.Add((statChangeEffect.Target, statChangeEffect.Stat, statChangeEffect.Delta));
-            _results.Add($"Effect has changed {statChangeEffect.Target} {statChangeEffect.Stat} by {statChangeEffect.Delta}! Now at {(statChangeEffect.Target == Target.Opponent ? _opponentStats.Get(StatType.Health) : _userStats.Get(StatType.Health))}");
+            LogAndAddToResult($"Effect has changed {statChangeEffect.Target} {statChangeEffect.Stat} by {statChangeEffect.Delta}! Now at {(statChangeEffect.Target == Target.Opponent ? _opponentStats.Get(StatType.Health) : _userStats.Get(StatType.Health))}");
             break;
         }
       }
@@ -183,18 +193,24 @@ public class CombatResolver
     {
       switch (target)
       {
-        case Target.User:
-          _results.Add($"Your golem has its {statType} changed by {delta}");
+        case Target.Self:
+          LogAndAddToResult($"Your golem has its {statType} changed by {delta}");
           _userStats.Update(statType, delta);
           break;
         case Target.Opponent:
-          _results.Add($"Your opponent has its {statType} changed by {delta}");
+          LogAndAddToResult($"Your opponent has its {statType} changed by {delta}");
           _userStats.Update(statType, delta);
           break;
         default:
           throw new ArgumentOutOfRangeException();
       }
     }
+  }
+
+  private void LogAndAddToResult(string message)
+  {
+    _log.Debug(message);
+    _results.Add(message);
   }
 }
 

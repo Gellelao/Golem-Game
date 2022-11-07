@@ -230,7 +230,7 @@ var newParts = new List<Part>
             new StatChangeEffect
             {
                 Requirement = CommonPartProperties.GreaterThanZeroWater,
-                Target = Target.User,
+                Target = Target.Self,
                 Stat = StatType.Water,
                 Delta = -1
             }
@@ -259,7 +259,7 @@ var newParts = new List<Part>
         {
             new StatChangeTrigger
             {
-                Target = Target.User,
+                Target = Target.Self,
                 Stat = StatType.Health,
                 DeltaType = DeltaType.Decrease,
                 EffectRange = Locator.Self
@@ -269,7 +269,7 @@ var newParts = new List<Part>
         {
             new StatChangeEffect
             {
-                Target = Target.User,
+                Target = Target.Self,
                 Stat = StatType.Health,
                 Delta = 1,
                 Charges = 3

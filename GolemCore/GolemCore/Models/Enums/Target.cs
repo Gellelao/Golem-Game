@@ -2,6 +2,6 @@
 
 public enum Target
 {
-    User,
+    Self,
     Opponent
 }

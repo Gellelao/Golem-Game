@@ -16,7 +16,7 @@ public static class CommonPartProperties
 
     public static EffectRequirement GreaterThanZeroWater { get; } = new()
     {
-        Target = Target.User,
+        Target = Target.Self,
         Stat = StatType.Water,
         Comparator = Comparator.GreaterThan,
         Amount = 0
