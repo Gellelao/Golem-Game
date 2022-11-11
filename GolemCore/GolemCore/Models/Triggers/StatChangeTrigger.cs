@@ -9,9 +9,10 @@ public class StatChangeTrigger : Trigger
     public DeltaType DeltaType { get; init; }
     public int Threshold { get; init; }
     
-    public bool Triggered(Target target, StatType statType, int delta)
+    public bool Triggered(bool targetsSelf, StatType statType, int delta)
     {
-        if (Target != target) return false;
+        if (Target == Target.Opponent && targetsSelf) return false;
+        if (Target == Target.Self && !targetsSelf) return false;
         if (Stat != statType) return false;
         if (Math.Abs(delta) <= Threshold) return false;
         

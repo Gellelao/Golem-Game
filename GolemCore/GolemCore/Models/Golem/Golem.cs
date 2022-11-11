@@ -69,12 +69,9 @@ public class Golem
             foreach (var trigger in part.Triggers)
             {
                 if (trigger is not StatChangeTrigger statTrigger) continue;
-                foreach (var (target, statType, delta) in statChange.Changes)
+                if (statTrigger.Triggered(statChange.TargetsSelf, statChange.StatType, statChange.Delta))
                 {
-                    if (statTrigger.Triggered(target, statType, delta))
-                    {
-                        activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
-                    };
+                    activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
                 }
             }
         }
