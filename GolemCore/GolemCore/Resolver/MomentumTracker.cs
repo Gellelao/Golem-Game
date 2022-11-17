@@ -6,20 +6,20 @@ namespace GolemCore.Resolver;
 public class MomentumTracker
 {
     private readonly ILogger _log;
-    private readonly decimal _userSpeedAdjusted;
-    private readonly decimal _opponentSpeedAdjusted;
-    private decimal _userMomentum;
-    private decimal _opponentMomentum;
+    private readonly double _userSpeedAdjusted;
+    private readonly double _opponentSpeedAdjusted;
+    private double _userMomentum;
+    private double _opponentMomentum;
 
     public MomentumTracker(GolemStats userStats, GolemStats opponentStats, ILogger log)
     {
         _log = log;
-        var playerSpeed = userStats.Get(StatType.Speed);
-        decimal playerNegativeWeightFactor = playerSpeed/100 * userStats.Get(StatType.Weight);
+        var playerSpeed = (double)userStats.Get(StatType.Speed);
+        double playerNegativeWeightFactor = playerSpeed/100 * userStats.Get(StatType.Weight);
         _userSpeedAdjusted = playerSpeed - playerNegativeWeightFactor;
         
-        var opponentSpeed = opponentStats.Get(StatType.Speed);
-        decimal opponentNegativeWeightFactor = opponentSpeed/100 * opponentStats.Get(StatType.Weight);
+        var opponentSpeed = (double)opponentStats.Get(StatType.Speed);
+        double opponentNegativeWeightFactor = opponentSpeed/100 * opponentStats.Get(StatType.Weight);
         _opponentSpeedAdjusted = opponentSpeed - opponentNegativeWeightFactor;
     }
 
@@ -29,11 +29,15 @@ public class MomentumTracker
         {
             _userMomentum += _userSpeedAdjusted;
             _opponentMomentum += _opponentSpeedAdjusted;
-            _log.Debug("User momentum    : {a}", _userMomentum);
-            _log.Debug("Opponent momentum: {a}", _opponentMomentum);
+            _log.Debug("User momentum    : {a} | Opponent momentum: {b}", _userMomentum, _opponentMomentum);
         }
-        
-        if(_userMomentum == _opponentMomentum) return AttackOrder.Simultaneous;
+
+        if (_userMomentum == _opponentMomentum)
+        {
+            _opponentMomentum = 0;
+            _userMomentum = 0;
+            return AttackOrder.Simultaneous;
+        }
 
         if (_userMomentum >= 100)
         {

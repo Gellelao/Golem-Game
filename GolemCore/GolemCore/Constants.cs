@@ -11,7 +11,7 @@ public static class Constants
     
     public const int TurnLimit = 20;
     public const int StartingFunds = 200;
-    public const int StartingShopPartCount = 4;
+    public const int StartingShopPartCount = 40; // Only a high number for testing, reduce later
 
     public static readonly Dictionary<StatType, int> InitialStats = new()
     {
