@@ -1,4 +1,5 @@
-﻿using GolemCore.Models.Effects;
+﻿using GolemCore.Models;
+using GolemCore.Models.Effects;
 using GolemCore.Models.Enums;
 using GolemCore.Models.Golem;
 using GolemCore.Models.Part;
@@ -60,8 +61,7 @@ public class CombatResolver
             {
               new()
               {
-                TargetsPlayerGolem = false,
-                TargetsSelf = false,
+                TargetIsPlayerGolem = false,
                 StatType = StatType.Health,
                 Delta = _userStats.Get(StatType.Attack) * -1
               }
@@ -73,8 +73,7 @@ public class CombatResolver
           {
             new()
             {
-              TargetsPlayerGolem = true,
-              TargetsSelf = false,
+              TargetIsPlayerGolem = true,
               StatType = StatType.Health,
               Delta = _opponentStats.Get(StatType.Attack) * -1
             }
@@ -86,15 +85,13 @@ public class CombatResolver
           {
             new()
             {
-              TargetsPlayerGolem = false,
-              TargetsSelf = false,
+              TargetIsPlayerGolem = false,
               StatType = StatType.Health,
               Delta = _userStats.Get(StatType.Attack) * -1
             },
             new()
             {
-              TargetsPlayerGolem = true,
-              TargetsSelf = false,
+              TargetIsPlayerGolem = true,
               StatType = StatType.Health,
               Delta = _opponentStats.Get(StatType.Attack) * -1
             }
@@ -114,8 +111,8 @@ public class CombatResolver
         var opponentsActivatedParts = new List<Part>();
         foreach (var statChange in statChanges)
         {
-          usersActivatedParts.AddRange(_user.GetPartsActivatedByStatChange(statChange, _cache));
-          opponentsActivatedParts.AddRange(_opponent.GetPartsActivatedByStatChange(statChange, _cache));
+          usersActivatedParts.AddRange(_user.GetPartsActivatedByStatChange(statChange, statChange.TargetIsPlayerGolem ? Target.Self : Target.Opponent, _cache));
+          opponentsActivatedParts.AddRange(_opponent.GetPartsActivatedByStatChange(statChange, statChange.TargetIsPlayerGolem ? Target.Opponent : Target.Self, _cache));
         }
         
         _log.Debug("Number of User parts that were activated: {a}, Number of Opponent parts that were activated: {b}", usersActivatedParts.Count, opponentsActivatedParts.Count);
@@ -181,8 +178,7 @@ public class CombatResolver
             var targetsPlayerGolem = (targetsSelf && partsBelongToPlayersGolem) || !targetsSelf && !partsBelongToPlayersGolem;
             changesFromEffects.Add(new StatChange
             {
-              TargetsPlayerGolem = targetsPlayerGolem,
-              TargetsSelf = targetsSelf,
+              TargetIsPlayerGolem = targetsPlayerGolem,
               StatType = statChangeEffect.Stat,
               Delta = statChangeEffect.Delta
             });
@@ -199,7 +195,7 @@ public class CombatResolver
   {
     foreach (var statChange in statChanges)
     {
-      if (statChange.TargetsPlayerGolem)
+      if (statChange.TargetIsPlayerGolem)
       {
         LogAndAddToResult($"Your golem has its {statChange.StatType} changed by {statChange.Delta}");
         _userStats.Update(statChange.StatType, statChange.Delta);

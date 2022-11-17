@@ -60,7 +60,7 @@ public class Golem
         return activatedParts.Distinct().ToList();
     }
 
-    public List<Part.Part> GetPartsActivatedByStatChange(StatChange statChange, PartsCache partsCache)
+    public List<Part.Part> GetPartsActivatedByStatChange(StatChange statChange, Target target, PartsCache partsCache)
     {
         var activatedParts = new List<Part.Part>();
         foreach (var partId in NonEmptyIdList)
@@ -69,7 +69,7 @@ public class Golem
             foreach (var trigger in part.Triggers)
             {
                 if (trigger is not StatChangeTrigger statTrigger) continue;
-                if (statTrigger.Triggered(statChange.TargetsSelf, statChange.StatType, statChange.Delta))
+                if (statTrigger.Triggered(statChange, target))
                 {
                     activatedParts.AddRange(GetActivatedParts(trigger, partId, partsCache));
                 }

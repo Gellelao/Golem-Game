@@ -1,4 +1,5 @@
 ﻿using GolemCore.Models.Enums;
+using GolemCore.Resolver;
 
 namespace GolemCore.Models.Triggers;
 
@@ -9,19 +10,18 @@ public class StatChangeTrigger : Trigger
     public DeltaType DeltaType { get; init; }
     public int Threshold { get; init; }
     
-    public bool Triggered(bool targetsSelf, StatType statType, int delta)
+    public bool Triggered(StatChange statChange, Target target)
     {
-        if (Target == Target.Opponent && targetsSelf) return false;
-        if (Target == Target.Self && !targetsSelf) return false;
-        if (Stat != statType) return false;
-        if (Math.Abs(delta) <= Threshold) return false;
+        if (Target != target) return false;
+        if (Stat != statChange.StatType) return false;
+        if (Math.Abs(statChange.Delta) <= Threshold) return false;
         
         switch (DeltaType)
         {
             case DeltaType.Increase:
-                return delta > 0;
+                return statChange.Delta > 0;
             case DeltaType.Decrease:
-                return delta < 0;
+                return statChange.Delta < 0;
             default:
                 throw new ArgumentOutOfRangeException();
         }

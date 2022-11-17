@@ -1,11 +1,10 @@
 ﻿using GolemCore.Models.Enums;
 
-namespace GolemCore.Resolver;
+namespace GolemCore.Models;
 
 public class StatChange
 {
-    public bool TargetsPlayerGolem { get; init; }
-    public bool TargetsSelf { get; init; }
+    public bool TargetIsPlayerGolem { get; init; }
     public StatType StatType { get; init; }
     public int Delta { get; init; }
 }
