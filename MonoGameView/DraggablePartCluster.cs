@@ -180,6 +180,25 @@ public class DraggablePartCluster
         UpdatePartPositionsToMatchCluster();
     }
 
+    public Vector2 GetDimensions()
+    {
+        var maxX = 0;
+        var maxY = 0;
+        for (var x = 0; x < _draggableParts.Length; x++)
+        {
+            for (var y = 0; y < _draggableParts[x].Length; y++)
+            {
+                if (_draggableParts[x][y] != null)
+                {
+                    maxX = x;
+                    maxY = y;
+                }
+            }
+        }
+
+        return new Vector2(maxX+1, maxY+1);
+    }
+
     private DraggablePart[][] RotateArray(DraggablePart[][] draggableParts)
     {
         var height = draggableParts.Length;

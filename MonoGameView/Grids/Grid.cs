@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -159,10 +161,11 @@ public abstract class Grid
         }
 
         var shapeCoords = cluster.MousePositionToPartCoords(mousePosition);
-        
-        for (var x = 0; x < Sockets.Length; x++)
+        var clusterDimensions = cluster.GetDimensions();
+
+        for (var x = 0; x < clusterDimensions.X; x++)
         {
-            for (var y = 0; y < Sockets[x].Length; y++)
+            for (var y = 0; y < clusterDimensions.Y; y++)
             {
                 var draggableToCheck = cluster.GetDraggableAtCoords(x, y);
 
@@ -171,7 +174,10 @@ public abstract class Grid
 
                 // If there is a draggablePart at these indices, and it's either out of bounds or the socket is occupied
                 // then mark that part as invalid using a null value in the dictionary
-                if (offsetX < 0 || offsetX >= Sockets.Length || offsetY < 0 || offsetY >= Sockets[x].Length ||
+                if (offsetX < 0 ||
+                    offsetX >= Sockets.Length ||
+                    offsetY < 0 ||
+                    offsetY >= Sockets[x].Length ||
                     (draggableToCheck != null && Sockets[offsetX][offsetY].StoredPart != null))
                 {
                     if (draggableToCheck != null)
