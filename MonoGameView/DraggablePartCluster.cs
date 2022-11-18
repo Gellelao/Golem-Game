@@ -15,6 +15,7 @@ public class DraggablePartCluster
     public bool DraggingEnabled { get; set; }
 
     private DraggablePart[][] _draggableParts;
+    private DraggablePart[][] _lastValidDraggableParts;
     private bool _beingDragged;
     private float _xOffsetFromMouse;
     private float _yOffsetFromMouse;
@@ -51,6 +52,8 @@ public class DraggablePartCluster
                 }
             }
         }
+
+        _lastValidDraggableParts = _draggableParts;
     }
 
     public void Draw(SpriteBatch spriteBatch)
