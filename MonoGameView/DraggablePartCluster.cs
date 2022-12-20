@@ -110,6 +110,7 @@ public class DraggablePartCluster
     {
         if (!DraggingEnabled) return false;
         _beingDragged = true;
+        _lastValidDraggableParts = _draggableParts;
         _dragOrigin = _position;
         _xOffsetFromMouse = mouseState.X - _position.X;
         _yOffsetFromMouse = mouseState.Y - _position.Y;
@@ -180,6 +181,7 @@ public class DraggablePartCluster
     public void RevertToPositionBeforeDrag()
     {
         _position = _dragOrigin;
+        _draggableParts = _lastValidDraggableParts;
         UpdatePartPositionsToMatchCluster();
     }
 
