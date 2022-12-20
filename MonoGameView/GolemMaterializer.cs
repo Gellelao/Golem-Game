@@ -37,7 +37,7 @@ public class GolemMaterializer
         var parts = new DraggablePart[golem.PartIds.Length][];
         for (var i = 0; i < parts.Length; i++)
         {
-            parts[i] = new[] {null, null, null, (DraggablePart) null};
+            parts[i] = new DraggablePart[parts.Length];
         }
         
         // Fill in that parts array with the DraggableParts generated earlier. Looks up the draggablePart list
