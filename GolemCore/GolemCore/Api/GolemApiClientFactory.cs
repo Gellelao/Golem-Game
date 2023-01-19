@@ -2,8 +2,8 @@
 
 public static class GolemApiClientFactory
 {
-    private static readonly string Host = "***REMOVED***";
-    private static readonly string ApiKey = "***REMOVED***";
+    private static readonly string Host = "";
+    private static readonly string ApiKey = "";
 
     public static IGolemApiClient Create()
     {
