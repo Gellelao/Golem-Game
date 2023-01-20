@@ -10,8 +10,8 @@ public static class Constants
     public const string GetPartEndpoint = "?TableName=part";
     
     public const int TurnLimit = 20;
-    public const int StartingFunds = 200;
-    public const int StartingShopPartCount = 40; // Only a high number for testing, reduce later
+    public const int StartingFunds = 5;
+    public const int StartingShopPartCount = 4;
 
     public static readonly Dictionary<StatType, int> InitialStats = new()
     {

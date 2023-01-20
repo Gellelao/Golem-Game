@@ -200,7 +200,7 @@ namespace MonoGameView
 
             if (_shopView != null)
             {
-                _spriteBatch.DrawString(_arialFont, $"{_shopView.GetPlayerFunds()}", new Vector2(20, 20), Color.Black);
+                _spriteBatch.DrawString(_arialFont, $"Funds: {_shopView.GetPlayerFunds()}", new Vector2(20, 20), Color.Black);
             }
             
             _spriteBatch.End();
